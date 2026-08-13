@@ -1,0 +1,7 @@
+{
+  "name": "Obsidiana Joyería - Gestión de Pedidos e Inventarios",
+  "description": "Sistema de ventas, inventario de joyas en Plata 925/950, logística de envíos por provincias de Perú, rastreo de pedidos y reportes.",
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
