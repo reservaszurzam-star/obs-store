@@ -22,19 +22,29 @@ import {
   EmailLog, 
   OrderStatus 
 } from './types';
+import {
+  INITIAL_PRODUCTS,
+  INITIAL_PROVINCES,
+  INITIAL_DISTRICTS,
+  INITIAL_ZONES,
+  INITIAL_ORDERS,
+  INITIAL_STOCK_MOVEMENTS,
+  INITIAL_EMAIL_LOGS,
+} from './data/mockData';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails'>('pos');
 
-  // Backend state
-  const [products, setProducts] = useState<Product[]>([]);
-  const [provinces, setProvinces] = useState<Province[]>([]);
-  const [districts, setDistricts] = useState<District[]>([]);
-  const [zones, setZones] = useState<Zone[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [stockMovements, setStockMovements] = useState<StockMovement[]>([]);
-  const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
+  // Backend state (initialized with local data so the deployed/static version
+  // shows the full catalog even when the Express backend is not running)
+  const [products, setProducts] = useState<Product[]>([...INITIAL_PRODUCTS]);
+  const [provinces, setProvinces] = useState<Province[]>([...INITIAL_PROVINCES]);
+  const [districts, setDistricts] = useState<District[]>([...INITIAL_DISTRICTS]);
+  const [zones, setZones] = useState<Zone[]>([...INITIAL_ZONES]);
+  const [orders, setOrders] = useState<Order[]>([...INITIAL_ORDERS]);
+  const [stockMovements, setStockMovements] = useState<StockMovement[]>([...INITIAL_STOCK_MOVEMENTS]);
+  const [emailLogs, setEmailLogs] = useState<EmailLog[]>([...INITIAL_EMAIL_LOGS]);
 
   // Modals state
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
