@@ -140,8 +140,8 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
       </nav>
 
       {/* Contrained Elegant Banner */}
-      <div className="pt-28 pb-8 px-4 md:px-6">
-        <div className="max-w-6xl mx-auto w-full h-[40vh] md:h-[50vh] min-h-[300px] max-h-[500px] rounded-2xl overflow-hidden shadow-sm border border-[#E4DFD7]/60 relative">
+      <div className="pt-24 md:pt-28 pb-4 md:pb-8 px-4 md:px-6">
+        <div className="max-w-6xl mx-auto w-full h-[30vh] md:h-[50vh] min-h-[180px] md:min-h-[300px] max-h-[500px] rounded-xl md:rounded-2xl overflow-hidden shadow-sm border border-[#E4DFD7]/60 relative">
           <img 
             src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
             alt="Obsidiana Banner Principal" 
@@ -193,7 +193,7 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
             <p className="text-[#A59B8F] mt-3 font-light text-sm">Explora otras categorías o términos de búsqueda.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-10 md:gap-x-8 md:gap-y-16">
             {filteredProducts.map((product) => (
               <div key={product.id} className="group cursor-pointer">
                 
@@ -204,25 +204,25 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
                   <ProductImage product={product} />
                   
                   {/* Etiqueta Flotante Sutil */}
-                  <div className="absolute top-4 left-4 z-20">
-                    <span className="text-[9px] font-bold tracking-widest text-[#61564A] uppercase bg-[#FDFCFB] px-3 py-1 shadow-sm">
+                  <div className="absolute top-2 left-2 md:top-4 md:left-4 z-20">
+                    <span className="text-[8px] md:text-[9px] font-bold tracking-widest text-[#61564A] uppercase bg-[#FDFCFB] px-2 py-0.5 md:px-3 md:py-1 shadow-sm">
                       {product.category}
                     </span>
                   </div>
                 </div>
 
                 {/* Info del Producto */}
-                <div className="space-y-2">
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="text-sm font-medium text-[#181716] leading-snug">
+                <div className="space-y-1.5 md:space-y-2 mt-2 md:mt-0">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-1 md:gap-4">
+                    <h3 className="text-xs md:text-sm font-medium text-[#181716] leading-snug line-clamp-2 md:line-clamp-none">
                       {product.name}
                     </h3>
-                    <div className="text-right shrink-0">
-                      <span className="text-sm font-semibold text-[#181716]">
+                    <div className="text-left md:text-right shrink-0">
+                      <span className="text-xs md:text-sm font-semibold text-[#181716]">
                         S/ {product.price.toFixed(2)}
                       </span>
                       {product.stock <= 0 && (
-                        <p className="text-[9px] font-bold tracking-widest text-red-400 uppercase mt-0.5">Agotado</p>
+                        <p className="text-[8px] md:text-[9px] font-bold tracking-widest text-red-400 uppercase mt-0.5">Agotado</p>
                       )}
                     </div>
                   </div>
