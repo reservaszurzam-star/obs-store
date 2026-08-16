@@ -139,13 +139,15 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
         </div>
       </nav>
 
-      {/* Full-Bleed Hero Banner (No Gradient) */}
-      <div className="w-full pt-20 bg-[#FDFCFB]">
-        <img 
-          src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
-          alt="Obsidiana Banner Principal" 
-          className="w-full h-auto object-contain block"
-        />
+      {/* Contrained Elegant Banner */}
+      <div className="pt-28 pb-8 px-4 md:px-6">
+        <div className="max-w-6xl mx-auto w-full h-[40vh] md:h-[50vh] min-h-[300px] max-h-[500px] rounded-2xl overflow-hidden shadow-sm border border-[#E4DFD7]/60 relative">
+          <img 
+            src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
+            alt="Obsidiana Banner Principal" 
+            className="w-full h-full object-cover object-center block"
+          />
+        </div>
       </div>
 
       {/* Filtros y Búsqueda Refinados */}
