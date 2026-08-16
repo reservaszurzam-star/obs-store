@@ -139,14 +139,25 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
         </div>
       </nav>
 
-      {/* Hero Section Banner */}
-      <div className="pt-24 pb-8 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto w-full">
-          <img 
-            src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
-            alt="Obsidiana Banner Principal" 
-            className="w-full h-auto object-cover rounded-2xl shadow-lg border border-[#E4DFD7]/40"
-          />
+      {/* Full-Bleed Banner */}
+      <div className="w-full pt-20 bg-[#FDFCFB]">
+        <img 
+          src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
+          alt="Obsidiana Nueva Colección" 
+          className="w-full h-auto object-cover"
+        />
+      </div>
+
+      {/* Hero Section Editorial */}
+      <div className="pt-16 pb-10 px-6">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="text-4xl md:text-5xl font-light text-[#181716] tracking-tighter">
+            Elegancia <span className="italic font-serif text-[#61564A]">Atemporal</span>
+          </h2>
+          <p className="max-w-xl mx-auto text-[#61564A] font-light leading-relaxed text-sm md:text-base">
+            Descubre nuestra selección curada de piezas en Plata 925 y 950. 
+            Diseños creados para resaltar tu esencia en cada momento.
+          </p>
         </div>
       </div>
 
