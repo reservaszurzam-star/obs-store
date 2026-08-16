@@ -36,6 +36,7 @@ import {
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { productosService, pedidosService, configService, clientesService } from './lib/services';
+import { zonasService } from './lib/zonasService';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails' | 'clients'>('pos');
@@ -146,14 +147,21 @@ export default function App() {
         timeline: [],
       }));
 
+      const [provs, zons, dists] = await Promise.all([
+        zonasService.getProvincias(),
+        zonasService.getZonas(),
+        zonasService.getDistritos()
+      ]);
+
+      setProvinces(provs.length > 0 ? provs : INITIAL_PROVINCES);
+      setZones(zons.length > 0 ? zons : INITIAL_ZONES);
+      setDistricts(dists.length > 0 ? dists : INITIAL_DISTRICTS);
+
       // Si Supabase devuelve productos, úsalos; si no, usa mockData como fallback
       setProducts(mappedProducts.length > 0 ? mappedProducts : INITIAL_PRODUCTS);
-      setProvinces(dbProvincias.length > 0 ? dbProvincias : INITIAL_PROVINCES);
-      setZones(dbZonas.length > 0 ? dbZonas : INITIAL_ZONES);
       setOrders(mappedOrders);
 
-      // Distritos/Stock local
-      setDistricts(INITIAL_DISTRICTS);
+      // Stock local y logs
       setStockMovements(INITIAL_STOCK_MOVEMENTS);
       setEmailLogs(INITIAL_EMAIL_LOGS);
 
@@ -163,6 +171,7 @@ export default function App() {
       setProducts(INITIAL_PRODUCTS);
       setProvinces(INITIAL_PROVINCES);
       setZones(INITIAL_ZONES);
+      setDistricts(INITIAL_DISTRICTS);
     }
   };
 
@@ -379,38 +388,61 @@ export default function App() {
 
   // 5. Add Zone
   const handleAddZone = async (zoneData: any) => {
-    const res = await fetch('/api/zones', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(zoneData),
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Error al agregar zona');
+    try {
+      const newZone = await zonasService.crearZona(zoneData);
+      setZones((prev) => [newZone, ...prev]);
+      showToast(`Nueva zona de envío "${newZone.name}" creada.`);
+    } catch (err: any) {
+      console.error(err);
+      throw new Error(err.message || 'Error al agregar zona');
     }
+  };
 
-    const newZone = await res.json();
-    setZones((prev) => [newZone, ...prev]);
-    showToast(`Nueva zona de envío "${newZone.name}" creada.`);
+  const handleUpdateZone = async (zoneId: string, updates: any) => {
+    try {
+      await zonasService.actualizarZona(zoneId, updates);
+      setZones(prev => prev.map(z => z.id === zoneId ? { ...z, ...updates } : z));
+      showToast(`Zona actualizada exitosamente.`);
+    } catch (err: any) {
+      console.error(err);
+      throw new Error(err.message || 'Error al actualizar zona');
+    }
+  };
+
+  const handleDeleteZone = async (zoneId: string) => {
+    try {
+      await zonasService.eliminarZona(zoneId);
+      setZones(prev => prev.filter(z => z.id !== zoneId));
+      // Also delete local districts attached to it
+      setDistricts(prev => prev.filter(d => d.zoneId !== zoneId));
+      showToast(`Zona eliminada exitosamente.`);
+    } catch (err: any) {
+      console.error(err);
+      showToast(`Error al eliminar zona: ${err.message}`, 'error');
+    }
   };
 
   // 6. Add District
   const handleAddDistrict = async (districtData: any) => {
-    const res = await fetch('/api/districts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(districtData),
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Error al agregar distrito');
+    try {
+      const newDist = await zonasService.crearDistrito(districtData);
+      setDistricts((prev) => [...prev, newDist]);
+      showToast(`Distrito "${newDist.name}" mapeado exitosamente.`);
+    } catch (err: any) {
+      console.error(err);
+      throw new Error(err.message || 'Error al agregar distrito');
     }
+  };
 
-    const newDist = await res.json();
-    setDistricts((prev) => [...prev, newDist]);
-    showToast(`Distrito "${newDist.name}" mapeado exitosamente.`);
+  const handleDeleteDistrict = async (districtId: string) => {
+    try {
+      await zonasService.eliminarDistrito(districtId);
+      setDistricts(prev => prev.filter(d => d.id !== districtId));
+      showToast(`Distrito eliminado exitosamente.`);
+    } catch (err: any) {
+      console.error(err);
+      showToast(`Error al eliminar distrito: ${err.message}`, 'error');
+    }
   };
 
   // 7. Test Email Send
@@ -595,6 +627,9 @@ export default function App() {
               zones={zones}
               onOpenAddZone={() => setIsAddZoneOpen(true)}
               onAddDistrict={handleAddDistrict}
+              onDeleteZone={handleDeleteZone}
+              onUpdateZone={handleUpdateZone}
+              onDeleteDistrict={handleDeleteDistrict}
             />
           )}
 
