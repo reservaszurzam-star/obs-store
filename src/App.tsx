@@ -55,6 +55,9 @@ export default function App() {
 
   // Nuevo estado para catálogo público
   const [isPublicCatalog, setIsPublicCatalog] = useState(() => window.location.hash === '#catalogo');
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => localStorage.getItem('obs_admin_auth') === 'true');
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  const ADMIN_PASSWORD = 'zurzam2026'; // Simple hardcoded password
   const [adjustStockProduct, setAdjustStockProduct] = useState<Product | null>(null);
   const [isAddZoneOpen, setIsAddZoneOpen] = useState(false);
   const [trackingCodeForSearch, setTrackingCodeForSearch] = useState('');
@@ -298,6 +301,46 @@ export default function App() {
   // Si es la vista pública, renderizar SOLAMENTE el catálogo virtual
   if (isPublicCatalog) {
     return <PublicCatalog products={products} />;
+  }
+
+  if (!isAdminAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-slate-100 text-center space-y-6">
+          <div className="w-16 h-16 bg-[#181716] mx-auto rounded-lg flex items-center justify-center shadow-md overflow-hidden">
+             <img src="/assets/Icono/icono-negro.jpeg" alt="Logo" className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black tracking-widest text-[#181716]">ACCESO ADMIN</h2>
+            <p className="text-xs text-slate-500 mt-2">Ingresa tu código de seguridad para continuar.</p>
+          </div>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (adminPasswordInput === ADMIN_PASSWORD) {
+              setIsAdminAuthenticated(true);
+              localStorage.setItem('obs_admin_auth', 'true');
+            } else {
+              alert('Contraseña incorrecta');
+              setAdminPasswordInput('');
+            }
+          }} className="space-y-4">
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={adminPasswordInput}
+              onChange={(e) => setAdminPasswordInput(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-center tracking-widest focus:outline-none focus:border-[#61564A]"
+            />
+            <button type="submit" className="w-full bg-[#61564A] text-[#E4DFD7] font-bold py-3 rounded-lg uppercase tracking-wider hover:bg-[#181716] transition-colors">
+              Ingresar
+            </button>
+          </form>
+          <button onClick={() => { window.location.hash = '#catalogo'; window.location.reload(); }} className="text-xs text-slate-400 hover:text-[#61564A] underline mt-4">
+            Volver al Catálogo Público
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
