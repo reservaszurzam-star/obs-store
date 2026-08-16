@@ -43,6 +43,8 @@ export interface PedidoInput {
   cliente_referencia?: string;
   cliente_provincia?: string;
   cliente_distrito?: string;
+  cliente_zona?: string;
+  cliente_notas?: string;
   cliente_coords_lat?: number | null;
   cliente_coords_lng?: number | null;
   // Totales
@@ -168,10 +170,20 @@ export const pedidosService = {
   async crear(input: PedidoInput): Promise<string> {
     const { items, ...pedidoData } = input;
 
+    // Generar IDs si no vienen en input
+    const randomSuffix = Math.floor(Math.random() * 100000);
+    const payload = {
+      ...pedidoData,
+      numero_pedido: `PED-2026-${randomSuffix}`,
+      codigo_tracking: `TRK-${randomSuffix}`,
+      tarifa_envio: input.costo_envio,
+      estado: pedidoData.estado ?? 'pendiente'
+    };
+
     // 1. Crear pedido
     const { data: pedido, error: pedidoError } = await supabase
       .from('pedidos')
-      .insert({ ...pedidoData, estado: pedidoData.estado ?? 'pendiente' })
+      .insert(payload)
       .select('id')
       .single();
 

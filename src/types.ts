@@ -86,6 +86,13 @@ export interface OrderCustomer {
   coords?: { lat: number; lng: number };
 }
 
+export interface Customer extends OrderCustomer {
+  id?: string;
+  totalOrders?: number;
+  totalSpent?: number;
+  lastOrderDate?: string;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;

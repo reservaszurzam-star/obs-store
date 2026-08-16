@@ -35,6 +35,7 @@ import {
 } from './data/mockData';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { productosService, pedidosService, configService, clientesService } from './lib/services';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails' | 'clients'>('pos');
@@ -136,23 +137,56 @@ export default function App() {
 
   // 1. Submit Order
   const handleCreateOrder = async (orderData: any) => {
-    const res = await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderData),
-    });
+    try {
+      // Buscar o crear cliente primero
+      let cliente_id = undefined;
+      if (orderData.customer) {
+        const id = await clientesService.buscarOCrear({
+          nombre: orderData.customer.name,
+          email: orderData.customer.email,
+          telefono: orderData.customer.phone,
+          direccion: orderData.customer.address,
+          provincia: orderData.customer.province,
+          distrito: orderData.customer.district,
+        });
+        if (id) cliente_id = id;
+      }
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Error al crear pedido');
+      await pedidosService.crear({
+        numero_nota: 'NV-' + Math.floor(Math.random() * 10000),
+        cliente_id: cliente_id,
+        cliente_nombre: orderData.customer.name,
+        cliente_email: orderData.customer.email,
+        cliente_telefono: orderData.customer.phone,
+        cliente_direccion: orderData.customer.address,
+        cliente_provincia: orderData.customer.province,
+        cliente_distrito: orderData.customer.district,
+        cliente_zona: orderData.customer.zone,
+        cliente_notas: orderData.customer.notes,
+        subtotal: orderData.subtotal,
+        descuento: 0,
+        costo_envio: orderData.shippingFee,
+        total: orderData.total,
+        adelanto: 0,
+        saldo: orderData.total,
+        tipo_entrega: orderData.shippingFee > 15 ? 'provincia' : 'express',
+        metodo_pago: 'Efectivo',
+        estado: 'pendiente',
+        items: orderData.items.map((i: any) => ({
+          producto_id: i.productId,
+          producto_nombre: i.productName,
+          cantidad: i.quantity,
+          precio_unitario: i.unitPrice,
+          total: i.total
+        }))
+      });
+
+      showToast(`¡Pedido creado exitosamente!`);
+      loadInitialData(); // Reload from DB to get the new order and updated stock
+    } catch (err: any) {
+      console.error(err);
+      throw new Error(err.message || 'Error al crear pedido en Supabase');
     }
-
-    const data = await res.json();
-    setOrders((prev) => [data.order, ...prev]);
-    if (data.products) setProducts(data.products);
-    if (data.email) setEmailLogs((prev) => [data.email, ...prev]);
-
-    showToast(`¡Pedido ${data.order.orderNumber} creado con código de rastreo ${data.order.trackingCode}!`);
   };
 
   // 2. Update Order Status
