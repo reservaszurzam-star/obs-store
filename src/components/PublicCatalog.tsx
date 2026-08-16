@@ -139,19 +139,14 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
         </div>
       </nav>
 
-      {/* Hero Section Editorial */}
-      <div className="pt-32 pb-16 px-6">
-        <div className="max-w-5xl mx-auto text-center space-y-8">
-          <p className="text-xs font-semibold tracking-[0.4em] text-[#A59B8F] uppercase">
-            Nueva Temporada
-          </p>
-          <h2 className="text-5xl md:text-7xl font-light text-[#181716] tracking-tighter">
-            Elegancia <span className="italic font-serif text-[#61564A]">Atemporal</span>
-          </h2>
-          <p className="max-w-xl mx-auto text-[#61564A] font-light leading-relaxed text-sm md:text-base">
-            Descubre nuestra selección curada de piezas en Plata 925 y 950. 
-            Diseños creados para resaltar tu esencia en cada momento.
-          </p>
+      {/* Hero Section Banner */}
+      <div className="pt-24 pb-8 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto w-full">
+          <img 
+            src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
+            alt="Obsidiana Banner Principal" 
+            className="w-full h-auto object-cover rounded-2xl shadow-lg border border-[#E4DFD7]/40"
+          />
         </div>
       </div>
 
