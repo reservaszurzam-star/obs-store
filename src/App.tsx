@@ -223,7 +223,7 @@ export default function App() {
         if (id) cliente_id = id;
       }
 
-      await pedidosService.crear({
+      const result = await pedidosService.crear({
         numero_nota: 'NV-' + Math.floor(Math.random() * 10000),
         cliente_id: cliente_id,
         cliente_nombre: orderData.customer.name,
@@ -252,6 +252,24 @@ export default function App() {
         }))
       });
 
+      // Enviar correo de confirmación
+      try {
+        await fetch('/api/emails/order-created', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            orderData: {
+              ...orderData,
+              id: result.id,
+              orderNumber: result.numero_pedido,
+              trackingCode: result.codigo_tracking,
+            }
+          }),
+        });
+      } catch (err) {
+        console.warn("Express endpoint for emails not available", err);
+      }
+
       showToast(`¡Pedido creado exitosamente!`);
       loadInitialData(); // Reload from DB to get the new order and updated stock
     } catch (err: any) {
@@ -262,27 +280,50 @@ export default function App() {
 
   // 2. Update Order Status
   const handleUpdateOrderStatus = async (orderId: string, status: OrderStatus, note?: string) => {
-    const res = await fetch(`/api/orders/${orderId}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status, note }),
-    });
+    try {
+      // 1. Update in Supabase
+      await pedidosService.updateEstado(orderId, status);
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Error al actualizar estado');
-    }
+      // 2. Prepare mock order data for Express server to send the email
+      const targetOrder = orders.find((o) => o.id === orderId);
+      const mappedOrder = targetOrder ? {
+        id: targetOrder.id,
+        orderNumber: targetOrder.numero_pedido,
+        trackingCode: targetOrder.codigo_tracking,
+        timeline: [], // Express tries to update timeline
+        customer: {
+          name: targetOrder.cliente_nombre,
+          email: targetOrder.cliente_email,
+        }
+      } : null;
 
-    const data = await res.json();
-    setOrders((prev) => prev.map((o) => (o.id === orderId ? data.order : o)));
-    if (selectedOrder && selectedOrder.id === orderId) {
-      setSelectedOrder(data.order);
-    }
-    if (data.email) {
-      setEmailLogs((prev) => [data.email, ...prev]);
-    }
+      // 3. Trigger Express to send email
+      try {
+        const res = await fetch(`/api/orders/${orderId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status, note, orderData: mappedOrder }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.email) {
+            setEmailLogs((prev) => [data.email, ...prev]);
+          }
+        }
+      } catch (e) {
+        console.warn('Backend express no disponible para enviar correos');
+      }
 
-    showToast(`Estado de pedido actualizado a "${status.toUpperCase()}". Correo enviado al cliente.`);
+      // 4. Update UI State
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, estado: status } : o)));
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder({ ...selectedOrder, estado: status });
+      }
+
+      showToast(`Estado de pedido actualizado a "${status.toUpperCase()}". Correo enviado al cliente.`);
+    } catch (err: any) {
+      showToast(err.message || 'Error al actualizar estado', 'error');
+    }
   };
 
   // 3. Add Product

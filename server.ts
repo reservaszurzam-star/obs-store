@@ -208,7 +208,7 @@ async function startServer() {
     });
   });
 
-  // Create New Order
+  // Create New Order (Original logic for local db)
   app.post("/api/orders", (req, res) => {
     try {
       const { customer, items, shippingFee, paymentMethod } = req.body;
@@ -250,10 +250,10 @@ async function startServer() {
         }
       });
 
-      const subtotal = items.reduce((acc: number, curr: any) => acc + curr.total, 0);
-      const total = subtotal + (shippingFee || 0);
       const orderNumber = generateOrderNumber();
       const trackingCode = generateTrackingCode();
+      const subtotal = items.reduce((acc: number, item: any) => acc + item.unitPrice * item.quantity, 0);
+      const total = subtotal + Number(shippingFee);
 
       const newOrder: Order = {
         id: `ord-${Date.now()}`,
@@ -262,38 +262,38 @@ async function startServer() {
         customer,
         items,
         subtotal,
-        shippingFee: shippingFee || 0,
+        shippingFee: Number(shippingFee),
         total,
+        paymentMethod,
         status: "pendiente",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        estimatedDelivery: "En 24 a 48 Horas",
-        paymentMethod: paymentMethod || "Transferencia / Yape",
+        estimatedDelivery: "2 a 5 días hábiles",
         timeline: [
           {
             id: `step-1-${Date.now()}`,
             status: "pendiente",
-            title: "Pedido Registrado con Éxito",
-            description: `Solicitud ingresada por ${customer.name}. Pago confirmado vía ${paymentMethod || "Sistema"}`,
-            location: "Centro de Procesamiento Central",
+            title: "Pedido Recibido",
+            description: "Hemos recibido tu pedido y el pago ha sido confirmado.",
+            location: "Sistema Logístico",
             timestamp: new Date().toISOString(),
             completed: true,
           },
           {
             id: `step-2-${Date.now()}`,
             status: "en_preparacion",
-            title: "Asignación de Almacén y Empaque",
-            description: "Picking de inventario y etiquetado de despacho",
-            location: "Almacén Principal",
+            title: "En Preparación",
+            description: "Tu pedido está siendo empaquetado cuidadosamente.",
+            location: "Almacén Central",
             timestamp: "",
             completed: false,
           },
           {
             id: `step-3-${Date.now()}`,
             status: "en_ruta",
-            title: "En Camino al Destino",
-            description: `Ruta de entrega hacia ${customer.district}, ${customer.province}`,
-            location: customer.zone || "Ruta de Despacho",
+            title: "En Ruta de Entrega",
+            description: "El paquete fue entregado al courier y está en camino.",
+            location: "Centro de Distribución",
             timestamp: "",
             completed: false,
           },
@@ -317,25 +317,38 @@ async function startServer() {
 
       dbOrders.unshift(newOrder);
 
-      // Create Order Confirmation Email Notification
+      res.status(201).json({ order: newOrder, products: dbProducts });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Error al crear el pedido" });
+    }
+  });
+
+  // Endpoint specific for sending Order Created Email
+  app.post("/api/emails/order-created", (req, res) => {
+    try {
+      const { orderData } = req.body;
+      if (!orderData || !orderData.customer) {
+        return res.status(400).json({ error: "Faltan datos del pedido" });
+      }
+
       const emailNotification: EmailLog = {
         id: `email-${Date.now()}`,
-        orderId: newOrder.id,
-        trackingCode: newOrder.trackingCode,
-        recipientEmail: customer.email,
-        recipientName: customer.name,
-        subject: `¡Confirmación de Pedido ${orderNumber}! Código de Tracking: ${trackingCode}`,
+        orderId: orderData.id || `ord-${Date.now()}`,
+        trackingCode: orderData.trackingCode,
+        recipientEmail: orderData.customer.email,
+        recipientName: orderData.customer.name,
+        subject: `¡Confirmación de Pedido ${orderData.orderNumber}! Código de Tracking: ${orderData.trackingCode}`,
         templateType: "order_created",
         sentAt: new Date().toISOString(),
         status: "sent",
         bodyHtml: `
           <div style="font-family: Arial, sans-serif; padding: 24px; color: #1e293b; background: #f8fafc; border-radius: 8px;">
-            <h2 style="color: #2563eb; margin-top: 0;">¡Hola ${customer.name}, hemos recibido tu pedido!</h2>
-            <p>Tu orden <strong>${orderNumber}</strong> ha sido registrada exitosamente. Puedes dar seguimiento en tiempo real con tu código de rastreo.</p>
+            <h2 style="color: #2563eb; margin-top: 0;">¡Hola ${orderData.customer.name}, hemos recibido tu pedido!</h2>
+            <p>Tu orden <strong>${orderData.orderNumber}</strong> ha sido registrada exitosamente. Puedes dar seguimiento en tiempo real con tu código de rastreo.</p>
             <div style="background: #ffffff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px; margin: 16px 0;">
-              <p><strong>Código de Tracking:</strong> <span style="font-size: 18px; color: #2563eb; font-weight: bold;">${trackingCode}</span></p>
-              <p><strong>Dirección de Entrega:</strong> ${customer.address}, ${customer.district}, ${customer.province}</p>
-              <p><strong>Total Cancelado:</strong> S/ ${total.toFixed(2)}</p>
+              <p><strong>Código de Tracking:</strong> <span style="font-size: 18px; color: #2563eb; font-weight: bold;">${orderData.trackingCode}</span></p>
+              <p><strong>Dirección de Entrega:</strong> ${orderData.customer.address}</p>
+              <p><strong>Total Cancelado:</strong> S/ ${Number(orderData.total).toFixed(2)}</p>
             </div>
             <p>Atentamente,<br><strong>Equipo de Logística & Envíos</strong></p>
           </div>
@@ -345,20 +358,24 @@ async function startServer() {
       dbEmailLogs.unshift(emailNotification);
       sendEmail(emailNotification);
 
-      res.status(201).json({ order: newOrder, email: emailNotification, products: dbProducts });
+      res.status(200).json({ success: true, email: emailNotification });
     } catch (err: any) {
-      res.status(500).json({ error: err.message || "Error al crear el pedido" });
+      res.status(500).json({ error: err.message || "Error enviando correo" });
     }
   });
 
   // Update Order Status
   app.put("/api/orders/:id/status", (req, res) => {
     const { id } = req.params;
-    const { status, note, courier } = req.body as { status: OrderStatus; note?: string; courier?: any };
+    const { status, note, courier, orderData } = req.body as { status: OrderStatus; note?: string; courier?: any; orderData?: any };
 
-    const order = dbOrders.find((o) => o.id === id);
+    let order = dbOrders.find((o) => o.id === id);
     if (!order) {
-      return res.status(404).json({ error: "Pedido no encontrado." });
+      if (orderData) {
+        order = { ...orderData, status, updatedAt: new Date().toISOString() };
+      } else {
+        return res.status(404).json({ error: "Pedido no encontrado." });
+      }
     }
 
     order.status = status;

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   ShoppingBag, 
   Plus, 
@@ -161,6 +161,32 @@ export const PosModule: React.FC<PosModuleProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rightPanelTab, setRightPanelTab] = useState<'cliente_envio' | 'pago_totales'>('cliente_envio');
+
+  // Reverse geocoding to auto-detect district and address from GPS
+  useEffect(() => {
+    if (!customerCoords) return;
+    let isMounted = true;
+    const fetchAddress = async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${customerCoords.lat}&lon=${customerCoords.lng}&format=json`);
+        const data = await res.json();
+        if (isMounted && data && data.address) {
+          const addr = data.address;
+          const district = addr.suburb || addr.neighbourhood || addr.city_district || addr.town || addr.city || '';
+          if (district && !selectedDistrict) setSelectedDistrict(district);
+          
+          const road = addr.road || '';
+          const house = addr.house_number || '';
+          const fullAddress = `${road} ${house}`.trim();
+          if (fullAddress && !customerAddress) setCustomerAddress(fullAddress);
+        }
+      } catch (err) {
+        console.error('Error auto-detecting address from GPS:', err);
+      }
+    };
+    fetchAddress();
+    return () => { isMounted = false; };
+  }, [customerCoords]);
 
   // Available categories list
   const categoriesList = ['Aretes', 'Conjuntos', 'Collares', 'Pulseras', 'Anillos'];
@@ -411,7 +437,7 @@ export const PosModule: React.FC<PosModuleProps> = ({
           phone: customerPhone || '987 654 321',
           email: customerEmail || 'ventas@obsidiana.pe',
           address: customerAddress || 'Av. Arequipa 1234, Lince – Lima',
-          reference: customerReference || 'Alt. Cdra. 12 de Av. Arequipa',
+          reference: customerReference || '',
           province: selectedProvince,
           district: selectedDistrict || 'Lima',
           coords: customerCoords,
@@ -998,8 +1024,8 @@ export const PosModule: React.FC<PosModuleProps> = ({
                           <input type="text" value={selectedDistrict} onChange={(e) => setSelectedDistrict(e.target.value)} placeholder="Lince, Miraflores…" className="w-full bg-white border border-slate-200 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]" />
                         </div>
                         <div>
-                          <label className="text-[8px] font-bold text-slate-500 uppercase block mb-0.5">Referencia</label>
-                          <input type="text" value={customerReference} onChange={(e) => setCustomerReference(e.target.value)} placeholder="Alt. Cdra. 12" className="w-full bg-white border border-slate-200 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]" />
+                          <label className="text-[8px] font-bold text-slate-500 uppercase block mb-0.5">Referencia (Opcional)</label>
+                          <input type="text" value={customerReference} onChange={(e) => setCustomerReference(e.target.value)} placeholder="Alt. Cdra. 12 (Opcional)" className="w-full bg-white border border-slate-200 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]" />
                         </div>
                       </div>
                       <div>
@@ -1060,8 +1086,8 @@ export const PosModule: React.FC<PosModuleProps> = ({
                         <input type="text" value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} placeholder="Urb. Santa Mónica B-4…" className="w-full bg-white border border-slate-200 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]" />
                       </div>
                       <div>
-                        <label className="text-[8px] font-bold text-slate-500 uppercase block mb-0.5">Referencia</label>
-                        <input type="text" value={customerReference} onChange={(e) => setCustomerReference(e.target.value)} placeholder="Frente al parque…" className="w-full bg-white border border-slate-200 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]" />
+                        <label className="text-[8px] font-bold text-slate-500 uppercase block mb-0.5">Referencia (Opcional)</label>
+                        <input type="text" value={customerReference} onChange={(e) => setCustomerReference(e.target.value)} placeholder="Frente al parque (Opcional)…" className="w-full bg-white border border-slate-200 rounded-md px-2 py-1 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]" />
                       </div>
                     </div>
                   )}

@@ -170,15 +170,15 @@ export const clientesService = {
 // ─── PEDIDOS ──────────────────────────────────────────────────────────────────
 
 export const pedidosService = {
-  async crear(input: PedidoInput): Promise<string> {
-    const { items, ...pedidoData } = input;
+  async crear(input: PedidoInput): Promise<{ id: string, numero_pedido: string, codigo_tracking: string }> {
+    const { items, costo_envio, ...pedidoData } = input;
 
     const randomSuffix = Math.floor(Math.random() * 100000);
     const payload = {
       ...pedidoData,
       numero_pedido: `PED-2026-${randomSuffix}`,
       codigo_tracking: `TRK-${randomSuffix}`,
-      tarifa_envio: input.costo_envio,
+      tarifa_envio: costo_envio,
       estado: pedidoData.estado ?? 'pendiente'
     };
 
@@ -186,7 +186,7 @@ export const pedidosService = {
     const { data: pedido, error: pedidoError } = await supabase
       .from('pedidos')
       .insert(payload)
-      .select('id')
+      .select('id, numero_pedido, codigo_tracking')
       .single();
 
     if (pedidoError) throw pedidoError;
@@ -212,7 +212,11 @@ export const pedidosService = {
       metodo_pago: input.metodo_pago,
     });
 
-    return pedido.id;
+    return { 
+      id: pedido.id, 
+      numero_pedido: pedido.numero_pedido, 
+      codigo_tracking: pedido.codigo_tracking 
+    };
   },
 
   async getAll(limit = 50): Promise<any[]> {

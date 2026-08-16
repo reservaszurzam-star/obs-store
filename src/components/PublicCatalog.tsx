@@ -217,30 +217,37 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
                 </div>
 
                 {/* Info del Producto */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex items-start justify-between gap-4">
                     <h3 className="text-sm font-medium text-[#181716] leading-snug">
                       {product.name}
                     </h3>
-                    <span className="text-sm font-semibold text-[#181716]">
-                      S/ {product.price.toFixed(2)}
-                    </span>
+                    <div className="text-right shrink-0">
+                      <span className="text-sm font-semibold text-[#181716]">
+                        S/ {product.price.toFixed(2)}
+                      </span>
+                      {product.stock <= 0 && (
+                        <p className="text-[9px] font-bold tracking-widest text-red-400 uppercase mt-0.5">Agotado</p>
+                      )}
+                    </div>
                   </div>
-                  
-                  <div className="text-[10px] text-[#A59B8F] font-mono uppercase tracking-widest">
-                    REF: {product.sku}
-                  </div>
-                  
+
+                  {/* Material */}
+                  <p className="text-[10px] text-[#A59B8F] font-light tracking-wider uppercase">
+                    {(product as any).material || product.category}
+                  </p>
+
                   {/* Botón Agregar a la Bolsa */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      addToCart(product);
+                      if (product.stock > 0) addToCart(product);
                     }}
-                    className="w-full flex items-center justify-center gap-3 py-3 border border-[#181716] text-[#181716] hover:bg-[#181716] hover:text-[#FDFCFB] transition-all duration-300 text-[10px] font-bold tracking-[0.2em] uppercase mt-4"
+                    disabled={product.stock <= 0}
+                    className="w-full flex items-center justify-center gap-3 py-3 border border-[#181716] text-[#181716] hover:bg-[#181716] hover:text-[#FDFCFB] transition-all duration-300 text-[10px] font-bold tracking-[0.2em] uppercase mt-3 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#181716]"
                   >
-                    <span>Agregar a la Bolsa</span>
-                    <Plus className="w-3 h-3" />
+                    <span>{product.stock <= 0 ? 'Agotado' : 'Agregar a la Bolsa'}</span>
+                    {product.stock > 0 && <Plus className="w-3 h-3" />}
                   </button>
                 </div>
 
