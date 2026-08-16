@@ -308,7 +308,7 @@ export default function App() {
       <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-slate-100 text-center space-y-6">
           <div className="w-16 h-16 bg-[#181716] mx-auto rounded-lg flex items-center justify-center shadow-md overflow-hidden">
-             <img src="/assets/Icono/icono-negro.jpeg" alt="Logo" className="w-full h-full object-cover" />
+             <img src="/LOGO PRINCIPAL/LOGO PRINCIPAL.png" alt="Logo" className="w-full h-full object-cover" />
           </div>
           <div>
             <h2 className="text-xl font-black tracking-widest text-[#181716]">ACCESO ADMIN</h2>
