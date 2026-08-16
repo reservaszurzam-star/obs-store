@@ -34,6 +34,7 @@ import {
   INITIAL_EMAIL_LOGS,
 } from './data/mockData';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { supabase } from './lib/supabase';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails' | 'clients'>('pos');
@@ -54,10 +55,12 @@ export default function App() {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
 
   // Nuevo estado para catálogo público
-  const [isPublicCatalog, setIsPublicCatalog] = useState(() => window.location.hash === '#catalogo');
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => localStorage.getItem('obs_admin_auth') === 'true');
-  const [adminPasswordInput, setAdminPasswordInput] = useState('');
-  const ADMIN_PASSWORD = 'zurzam2026'; // Simple hardcoded password
+  const [isAdminRoute, setIsAdminRoute] = useState(() => window.location.hash === '#admin');
+  const [session, setSession] = useState<any>(null);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
   const [adjustStockProduct, setAdjustStockProduct] = useState<Product | null>(null);
   const [isAddZoneOpen, setIsAddZoneOpen] = useState(false);
   const [trackingCodeForSearch, setTrackingCodeForSearch] = useState('');
@@ -94,13 +97,40 @@ export default function App() {
   useEffect(() => {
     loadInitialData();
 
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
     // Escuchar cambios en el hash de la URL
     const handleHashChange = () => {
-      setIsPublicCatalog(window.location.hash === '#catalogo');
+      setIsAdminRoute(window.location.hash === '#admin');
     };
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      subscription.unsubscribe();
+    };
   }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+    const { error } = await supabase.auth.signInWithPassword({
+      email: authEmail,
+      password: authPassword,
+    });
+    if (error) setAuthError('Credenciales incorrectas');
+    setAuthLoading(false);
+  };
+
 
   // --- API HANDLERS ---
 
@@ -299,11 +329,11 @@ export default function App() {
   const lowStockCount = products.filter((p) => p.stock <= p.minStock).length;
 
   // Si es la vista pública, renderizar SOLAMENTE el catálogo virtual
-  if (isPublicCatalog) {
+  if (!isAdminRoute) {
     return <PublicCatalog products={products} />;
   }
 
-  if (!isAdminAuthenticated) {
+  if (!session) {
     return (
       <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-slate-100 text-center space-y-6">
@@ -312,31 +342,30 @@ export default function App() {
           </div>
           <div>
             <h2 className="text-xl font-black tracking-widest text-[#181716]">ACCESO ADMIN</h2>
-            <p className="text-xs text-slate-500 mt-2">Ingresa tu código de seguridad para continuar.</p>
+            <p className="text-xs text-slate-500 mt-2">Ingresa tus credenciales para continuar.</p>
           </div>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            if (adminPasswordInput === ADMIN_PASSWORD) {
-              setIsAdminAuthenticated(true);
-              localStorage.setItem('obs_admin_auth', 'true');
-            } else {
-              alert('Contraseña incorrecta');
-              setAdminPasswordInput('');
-            }
-          }} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              value={authEmail}
+              onChange={(e) => setAuthEmail(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-center tracking-widest focus:outline-none focus:border-[#61564A]"
+            />
             <input
               type="password"
               placeholder="Contraseña"
-              value={adminPasswordInput}
-              onChange={(e) => setAdminPasswordInput(e.target.value)}
+              value={authPassword}
+              onChange={(e) => setAuthPassword(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-center tracking-widest focus:outline-none focus:border-[#61564A]"
             />
-            <button type="submit" className="w-full bg-[#61564A] text-[#E4DFD7] font-bold py-3 rounded-lg uppercase tracking-wider hover:bg-[#181716] transition-colors">
-              Ingresar
+            {authError && <p className="text-red-500 text-xs font-bold">{authError}</p>}
+            <button disabled={authLoading} type="submit" className="w-full bg-[#61564A] text-[#E4DFD7] font-bold py-3 rounded-lg uppercase tracking-wider hover:bg-[#181716] transition-colors disabled:opacity-50">
+              {authLoading ? 'Verificando...' : 'Ingresar'}
             </button>
           </form>
-          <button onClick={() => { window.location.hash = '#catalogo'; window.location.reload(); }} className="text-xs text-slate-400 hover:text-[#61564A] underline mt-4">
-            Volver al Catálogo Público
+          <button onClick={() => { window.location.hash = ''; window.location.reload(); }} className="text-xs text-slate-400 hover:text-[#61564A] underline mt-4">
+            Ir a la Tienda Pública
           </button>
         </div>
       </div>
