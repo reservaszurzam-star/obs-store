@@ -11,6 +11,32 @@ interface CartItem {
   quantity: number;
 }
 
+const ProductImage = ({ product }: { product: Product }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (!product.imageUrl || hasError) {
+    return <Diamond className="w-16 h-16 text-[#A59B8F]/40 group-hover:scale-110 transition-transform duration-700 ease-out" />;
+  }
+
+  return (
+    <>
+      <img 
+        src={product.imageUrl} 
+        alt={product.name}
+        className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out mix-blend-multiply ${product.hoverImageUrl ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
+        onError={() => setHasError(true)}
+      />
+      {product.hoverImageUrl && (
+        <img 
+          src={product.hoverImageUrl} 
+          alt={`${product.name} - detalle`}
+          className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out mix-blend-multiply opacity-0 group-hover:opacity-100 group-hover:scale-105"
+        />
+      )}
+    </>
+  );
+};
+
 export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -43,18 +69,22 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
 
   const filteredProducts = useMemo(() => {
     return products
-      .filter((p) => p.stock > 0)
+      .filter((p) => (p.stock ?? 0) >= 0) // show all products including stock 0
       .filter((p) => {
         const matchSearch =
           p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.sku.toLowerCase().includes(searchQuery.toLowerCase());
+          (p.sku ?? '').toLowerCase().includes(searchQuery.toLowerCase());
         const matchCategory = categoryFilter === 'all' || p.category === categoryFilter;
         return matchSearch && matchCategory;
       });
   }, [products, searchQuery, categoryFilter]);
 
   const categories = useMemo(() => {
-    return ['all', ...Array.from(new Set(products.filter(p => p.stock > 0).map(p => p.category)))];
+    const order = ['Aretes', 'Conjuntos', 'Collares', 'Pulseras', 'Anillos'];
+    const existing = Array.from(new Set(products.map(p => p.category)));
+    const sorted = order.filter(c => existing.includes(c));
+    const rest = existing.filter(c => !order.includes(c));
+    return ['all', ...sorted, ...rest];
   }, [products]);
 
   const whatsappNumber = '51906313634';
@@ -176,24 +206,7 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
                 <div className="aspect-[4/5] bg-[#E4DFD7]/20 relative flex items-center justify-center p-8 mb-6 overflow-hidden">
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.03] transition-colors duration-500 z-10" />
                   
-                  {product.imageUrl ? (
-                    <>
-                      <img 
-                        src={product.imageUrl} 
-                        alt={product.name}
-                        className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out mix-blend-multiply ${product.hoverImageUrl ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
-                      />
-                      {product.hoverImageUrl && (
-                        <img 
-                          src={product.hoverImageUrl} 
-                          alt={`${product.name} - detalle`}
-                          className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out mix-blend-multiply opacity-0 group-hover:opacity-100 group-hover:scale-105"
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <Diamond className="w-16 h-16 text-[#A59B8F]/40 group-hover:scale-110 transition-transform duration-700 ease-out" />
-                  )}
+                  <ProductImage product={product} />
                   
                   {/* Etiqueta Flotante Sutil */}
                   <div className="absolute top-4 left-4 z-20">

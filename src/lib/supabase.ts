@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://tmahfmjkxyoiloinhjjd.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtYWhmbWpreHlvaWxvaW5oampkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NjkyNzgsImV4cCI6MjEwMjE0NTI3OH0.nTze_eLUREg99u3MGzBJbJ5cxAYSgsU9grI4akJ7EFE';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.warn('Faltan variables de entorno para Supabase. Verifica tu archivo .env');
+}
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

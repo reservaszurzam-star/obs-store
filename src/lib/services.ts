@@ -173,7 +173,6 @@ export const pedidosService = {
   async crear(input: PedidoInput): Promise<string> {
     const { items, ...pedidoData } = input;
 
-    // Generar IDs si no vienen en input
     const randomSuffix = Math.floor(Math.random() * 100000);
     const payload = {
       ...pedidoData,
@@ -245,7 +244,7 @@ export const pedidosService = {
       .single();
     if (error) throw error;
     return data;
-  },
+  }
 };
 
 // ─── ZONAS / PROVINCIAS ───────────────────────────────────────────────────────

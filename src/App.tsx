@@ -85,19 +85,33 @@ export default function App() {
         pedidosService.getAll()
       ]);
 
-      const mappedProducts: Product[] = dbProductos.map((p: any) => ({
-        id: p.id,
-        sku: p.sku || 'N/A',
-        name: p.nombre,
-        category: p.categoria,
-        price: Number(p.precio),
-        stock: p.stock,
-        minStock: p.stock_minimo || 5,
-        location: p.ubicacion || 'Almacén',
-        updatedAt: p.updated_at,
-        imageUrl: p.imagen_url || (p.sku ? `/productos/${p.sku.toLowerCase().replace('obs-', 'prod-')}.jpeg` : undefined),
-        hoverImageUrl: p.sku ? `/productos/${p.sku.toLowerCase().replace('obs-', 'prod-')}-hover.jpeg` : undefined,
-      }));
+      // Try to get imageUrl from mockData by name if SKU mapping might be wrong
+      const getMockImage = (nombre: string, sku: string) => {
+        const mock = INITIAL_PRODUCTS.find(m => m.name.toLowerCase() === nombre.toLowerCase());
+        if (mock?.imageUrl) return { imageUrl: mock.imageUrl, hoverImageUrl: mock.hoverImageUrl };
+        if (sku && sku !== 'N/A') {
+          const path = `/productos/${sku.toLowerCase().replace('obs-', 'prod-')}.jpeg`;
+          return { imageUrl: path, hoverImageUrl: path.replace('.jpeg', '-hover.jpeg') };
+        }
+        return { imageUrl: undefined, hoverImageUrl: undefined };
+      };
+
+      const mappedProducts: Product[] = dbProductos.map((p: any) => {
+        const imgs = getMockImage(p.nombre, p.sku || '');
+        return {
+          id: p.id,
+          sku: p.sku || 'N/A',
+          name: p.nombre,
+          category: p.categoria,
+          price: Number(p.precio),
+          stock: p.stock,
+          minStock: p.stock_minimo || 5,
+          location: p.ubicacion || 'Almacén',
+          updatedAt: p.updated_at,
+          imageUrl: p.imagen_url || imgs.imageUrl,
+          hoverImageUrl: imgs.hoverImageUrl,
+        };
+      });
 
       const mappedOrders: Order[] = dbPedidos.map((p: any) => ({
         id: p.id,
@@ -132,8 +146,8 @@ export default function App() {
         timeline: [],
       }));
 
-      // Siempre usamos los datos de Supabase, aunque estén vacíos
-      setProducts(mappedProducts);
+      // Si Supabase devuelve productos, úsalos; si no, usa mockData como fallback
+      setProducts(mappedProducts.length > 0 ? mappedProducts : INITIAL_PRODUCTS);
       setProvinces(dbProvincias.length > 0 ? dbProvincias : INITIAL_PROVINCES);
       setZones(dbZonas.length > 0 ? dbZonas : INITIAL_ZONES);
       setOrders(mappedOrders);
@@ -144,7 +158,11 @@ export default function App() {
       setEmailLogs(INITIAL_EMAIL_LOGS);
 
     } catch (err) {
-      console.error('Error cargando datos desde Supabase:', err);
+      console.error('Error cargando datos desde Supabase, usando datos locales:', err);
+      // Fallback completo a mockData si Supabase falla
+      setProducts(INITIAL_PRODUCTS);
+      setProvinces(INITIAL_PROVINCES);
+      setZones(INITIAL_ZONES);
     }
   };
 
@@ -271,22 +289,26 @@ export default function App() {
   const handleAddProduct = async (productData: any) => {
     try {
       await productosService.create({
-        nombre: productData.name,
-        categoria: productData.category,
-        precio: productData.price,
-        stock: productData.stock,
+        nombre:       productData.name,
+        categoria:    productData.category,
+        material:     productData.material || 'Plata 950',
+        precio:       productData.price,
+        stock:        productData.stock,
         stock_minimo: productData.minStock,
-        sku: productData.sku,
-        material: 'Plata 950',
-        activo: true
+        sku:          productData.sku,
+        ubicacion:    productData.location || 'Vitrina Principal',
+        descripcion:  productData.description || '',
+        imagen_url:   productData.imageUrl || null,
+        activo:       true
       });
-      showToast(`¡Producto "${productData.name}" agregado con éxito a Supabase!`);
-      loadInitialData(); // reload from DB
+      showToast(`¡Joya "${productData.name}" agregada al catálogo!`);
+      loadInitialData();
     } catch (err: any) {
       console.error(err);
       throw new Error(err.message || 'Error al agregar producto en Supabase');
     }
   };
+
 
   // 4. Adjust Stock
   const handleAdjustStock = async (

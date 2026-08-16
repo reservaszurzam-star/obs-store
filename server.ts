@@ -63,6 +63,9 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Serve static files from /public (images, etc.)
+  app.use(express.static(path.join(process.cwd(), 'public')));
+
   // --- API ROUTES ---
 
   app.get("/api/health", (_req, res) => {

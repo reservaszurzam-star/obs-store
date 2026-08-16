@@ -167,7 +167,11 @@ export const PosModule: React.FC<PosModuleProps> = ({
 
   // Filtered Districts based on province
   const availableDistricts = useMemo(() => {
-    const provObj = provinces.find((p) => p.name.toLowerCase() === selectedProvince.toLowerCase());
+    if (!selectedProvince) return districts;
+    const provObj = provinces.find((p: any) => {
+      const provName = p.name || p.nombre || '';
+      return provName.toLowerCase() === selectedProvince.toLowerCase();
+    });
     if (!provObj) return districts;
     return districts.filter((d) => d.provinceId === provObj.id);
   }, [provinces, districts, selectedProvince]);
@@ -380,7 +384,7 @@ export const PosModule: React.FC<PosModuleProps> = ({
       await onSubmitOrder(orderPayload);
 
       // Create Receipt Preview
-      const isProvincia = deliveryType === 'provincia' || selectedProvince.toLowerCase() !== 'lima';
+      const isProvincia = deliveryType === 'provincia' || (selectedProvince || '').toLowerCase() !== 'lima';
       const receiptNum = isProvincia ? `N° 0002-${Math.floor(100000 + Math.random() * 900000)}` : `N° 0001-${Math.floor(100000 + Math.random() * 900000)}`;
       const trackCode = `OBS-${Math.floor(100000 + Math.random() * 900000)}`;
 
