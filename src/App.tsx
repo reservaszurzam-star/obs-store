@@ -96,8 +96,8 @@ export default function App() {
         minStock: p.stock_minimo || 5,
         location: p.ubicacion || 'Almacén',
         updatedAt: p.updated_at,
-        imageUrl: p.imagen_url || (p.sku ? \`/productos/\${p.sku.toLowerCase().replace('obs-', 'prod-')}.jpeg\` : undefined),
-        hoverImageUrl: p.sku ? \`/productos/\${p.sku.toLowerCase().replace('obs-', 'prod-')}-hover.jpeg\` : undefined,
+        imageUrl: p.imagen_url || (p.sku ? `/productos/${p.sku.toLowerCase().replace('obs-', 'prod-')}.jpeg` : undefined),
+        hoverImageUrl: p.sku ? `/productos/${p.sku.toLowerCase().replace('obs-', 'prod-')}-hover.jpeg` : undefined,
       }));
 
       const mappedOrders: Order[] = dbPedidos.map((p: any) => ({
