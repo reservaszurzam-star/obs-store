@@ -337,8 +337,8 @@ export default function App() {
     return (
       <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-slate-100 text-center space-y-6">
-          <div className="w-full flex justify-center mb-2">
-             <img src="/LOGO PRINCIPAL/LOGO PRINCIPAL.png" alt="Logo Obsidiana" className="h-16 md:h-20 object-contain drop-shadow-sm" />
+          <div className="w-full flex justify-center mb-4">
+             <img src="/LOGO PRINCIPAL/LOGO PRINCIPAL.png" alt="Logo Obsidiana" className="w-48 sm:w-56 h-auto object-contain mix-blend-multiply" />
           </div>
           <div>
             <h2 className="text-xl font-black tracking-widest text-[#181716]">ACCESO ADMIN</h2>
