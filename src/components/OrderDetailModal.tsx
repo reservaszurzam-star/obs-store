@@ -90,18 +90,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setIsShippingLabelOpen(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-extrabold rounded-sm text-xs transition-all shadow-sm cursor-pointer"
-            >
-              <Truck className="w-3.5 h-3.5" />
-              <span>📦 Rotulado de Paquete</span>
-            </button>
-            <button
               onClick={handlePrintReceipt}
               className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-zinc-50 text-zinc-700 rounded-sm text-xs font-medium border border-zinc-200 transition-colors"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Imprimir Guía</span>
+              <span>Descargar Nota de Venta</span>
             </button>
             <button
               onClick={onClose}
@@ -309,6 +302,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
       </div>
 
       {/* Package Shipping Label Modal */}
+          {/* Package Shipping Label Modal */}
       <PackageShippingLabelModal
         isOpen={isShippingLabelOpen}
         onClose={() => setIsShippingLabelOpen(false)}
@@ -336,6 +330,149 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           items: order.items,
         }}
       />
+      {/* Hidden Printable Receipt */}
+      <div id="printable-receipt" className="hidden print:block absolute inset-0 bg-white text-slate-900 font-sans p-4">
+        <div className="max-w-2xl mx-auto border border-[#61564A] bg-white text-slate-900 overflow-hidden font-sans shadow-sm mb-4">
+          {/* Top Black Header */}
+          <div className="bg-[#161716] text-[#E4DFD7] p-4 sm:p-5 flex justify-between items-center">
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <img src="/assets/Icono/icono-blanco.jpeg" alt="Obsidiana Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-[#61564A]" />
+              <div>
+                <h1 className="font-serif font-medium text-2xl sm:text-4xl tracking-widest uppercase leading-none">
+                  OBSIDIANA
+                </h1>
+                <p className="text-[8px] sm:text-[10px] font-medium text-[#A59B8F] uppercase tracking-[0.25em] mt-1.5 ml-0.5">
+                  JOYERÍA EN PLATA 925/950
+                </p>
+              </div>
+            </div>
+
+            <div className="text-right flex flex-col items-end space-y-1">
+              <p className="text-[10px] sm:text-xs font-bold tracking-widest uppercase text-white mb-1">NOTA DE VENTA</p>
+              <div className="bg-white text-[#161716] font-bold font-mono text-[10px] sm:text-xs px-3 py-1 w-32 sm:w-40 text-center">
+                {order.orderNumber}
+              </div>
+              <p className="text-[9px] sm:text-[10px] font-bold text-[#A59B8F] mt-1">FECHA: {new Date(order.createdAt).toLocaleDateString('es-PE')}</p>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-6 space-y-5">
+            {/* DATOS DEL CLIENTE Box Grid */}
+            <div className="grid grid-cols-12 gap-4 text-xs">
+              {/* Left Details (8 cols) */}
+              <div className="col-span-12 sm:col-span-8 flex flex-col">
+                <div className="bg-[#E4DFD7] px-3 py-1.5 font-bold text-[10px] text-[#161716] uppercase tracking-widest">
+                  DATOS DEL CLIENTE
+                </div>
+                <div className="border border-t-0 border-[#E4DFD7] p-3 space-y-2.5 flex-1 bg-white">
+                  <div className="flex items-center">
+                    <User className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                    <span className="w-24 uppercase text-[9px] text-slate-600 font-bold tracking-wider">NOMBRE:</span>
+                    <span className="font-semibold text-slate-900 border-b border-slate-200 flex-1 pb-0.5 px-1">{order.customer.name}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Mail className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                    <span className="w-24 uppercase text-[9px] text-slate-600 font-bold tracking-wider">EMAIL:</span>
+                    <span className="font-medium text-slate-900 border-b border-slate-200 flex-1 pb-0.5 px-1">{order.customer.email}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Phone className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                    <span className="w-24 uppercase text-[9px] text-slate-600 font-bold tracking-wider">TELÉFONO:</span>
+                    <span className="font-medium text-slate-900 border-b border-slate-200 flex-1 pb-0.5 px-1">{order.customer.phone}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                    <span className="w-24 uppercase text-[9px] text-slate-600 font-bold tracking-wider">DIRECCIÓN:</span>
+                    <span className="font-medium text-slate-900 truncate border-b border-slate-200 flex-1 pb-0.5 px-1">{order.customer.address}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Badge Card (4 cols) */}
+              <div className="col-span-12 sm:col-span-4 flex flex-col">
+                <div className="bg-[#E4DFD7] p-2.5 flex flex-col items-center justify-center">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-bold text-[10px] text-[#161716] uppercase tracking-wider">ZONA: {order.customer.zone || 'LIMA'}</span>
+                  </div>
+                </div>
+                <div className="bg-[#F8F7F5] p-3 border border-t-0 border-[#E4DFD7] space-y-3 flex-1">
+                  <div>
+                    <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">COSTO ENVÍO</p>
+                    <p className="font-medium text-slate-900 text-[11px] border-b border-[#E4DFD7] pb-1">S/ {order.shippingFee.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">ADELANTO:</p>
+                    <p className="font-medium text-slate-900 text-[11px] border-b border-[#E4DFD7] pb-1">S/ {(order.adelanto || 0).toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">SALDO:</p>
+                    <p className="font-medium text-slate-900 text-[11px] border-b border-[#E4DFD7] pb-1">
+                      {order.total - (order.adelanto || 0) > 0 ? `S/ ${(order.total - (order.adelanto || 0)).toFixed(2)} (Pendiente)` : 'CANCELADO'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Items Table */}
+            <table className="w-full text-left text-[10px] border-collapse border border-[#A59B8F]">
+              <thead>
+                <tr className="bg-[#A59B8F] text-[#161716] font-bold uppercase tracking-wider">
+                  <th className="py-2 px-2 text-center border border-[#A59B8F] w-12">CANT.</th>
+                  <th className="py-2 px-3 border border-[#A59B8F]">PRODUCTO</th>
+                  <th className="py-2 px-2 text-center border border-[#A59B8F]">PRECIO UNIT.</th>
+                  <th className="py-2 px-3 text-center border border-[#A59B8F]">TOTAL</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white text-slate-800">
+                {order.items.map((item, idx) => (
+                  <tr key={idx}>
+                    <td className="py-2 px-2 text-center font-medium border border-[#A59B8F]">{item.quantity}</td>
+                    <td className="py-2 px-3 font-medium border border-[#A59B8F]">{item.productName}</td>
+                    <td className="py-2 px-2 text-center font-medium border border-[#A59B8F]">S/ {item.unitPrice.toFixed(2)}</td>
+                    <td className="py-2 px-3 text-center font-medium border border-[#A59B8F]">S/ {item.total.toFixed(2)}</td>
+                  </tr>
+                ))}
+                {Array.from({ length: Math.max(0, 4 - order.items.length) }).map((_, i) => (
+                  <tr key={`blank-${i}`} className="h-7">
+                    <td className="border border-[#A59B8F]"></td>
+                    <td className="border border-[#A59B8F]"></td>
+                    <td className="border border-[#A59B8F]"></td>
+                    <td className="border border-[#A59B8F]"></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Totals Section */}
+            <div className="flex justify-end mt-4">
+              <div className="w-full sm:w-1/2 flex flex-col items-end">
+                <div className="flex justify-between w-full p-2 border-b border-slate-200">
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Subtotal:</span>
+                  <span className="text-xs font-semibold text-slate-900">S/ {order.subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between w-full p-2 border-b border-slate-200">
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Envío:</span>
+                  <span className="text-xs font-semibold text-slate-900">S/ {order.shippingFee.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between w-full p-3 bg-[#E4DFD7] text-[#161716] mt-2">
+                  <span className="text-sm font-bold uppercase tracking-widest">Total General:</span>
+                  <span className="text-sm font-black">
+                    S/ {order.total.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Guarantee Section */}
+            <div className="mt-6 pt-5 border-t border-dashed border-[#A59B8F] text-center space-y-1">
+              <p className="text-[10px] font-bold text-[#161716] uppercase tracking-widest">GARANTÍA DE AUTENTICIDAD DE POR VIDA</p>
+              <p className="text-[9px] text-[#61564A]">Esta nota de venta certifica la autenticidad de sus joyas trabajadas en Plata Ley 925/950 por Obsidiana Joyería Perú.</p>
+              <p className="text-[8px] text-[#A59B8F] mt-2 tracking-widest uppercase">GRACIAS POR ELEGIRNOS - @OBSIDIANA.JOYERIA</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
