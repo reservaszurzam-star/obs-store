@@ -11,13 +11,13 @@ import {
   Menu,
   X,
   Gem,
-  Store
+  Store,
+  Users
 } from 'lucide-react';
 
 interface SidebarProps {
-  activeTab: 'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails';
-  setActiveTab: (tab: 'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails') => void;
-  onOpenNewOrder: () => void;
+  activeTab: 'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails' | 'clients';
+  setActiveTab: (tab: 'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails' | 'clients') => void;
   onResetData: () => void;
   pendingOrdersCount: number;
   lowStockCount: number;
@@ -26,7 +26,6 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   setActiveTab,
-  onOpenNewOrder,
   onResetData,
   pendingOrdersCount,
   lowStockCount,
@@ -47,6 +46,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: ShoppingBag,
       badge: pendingOrdersCount > 0 ? pendingOrdersCount : null,
       badgeColor: 'bg-[#61564A] text-[#E4DFD7]',
+    },
+    {
+      id: 'clients' as const,
+      label: 'Directorio de Clientes',
+      icon: Users,
     },
     {
       id: 'inventory' as const,
@@ -77,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
   ];
 
-  const handleNavClick = (id: 'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails') => {
+  const handleNavClick = (id: 'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails' | 'clients') => {
     setActiveTab(id);
     setMobileOpen(false);
   };
@@ -87,8 +91,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Mobile Header Bar */}
       <div className="md:hidden bg-[#181716] border-b border-[#61564A]/40 px-4 py-3 flex items-center justify-between text-[#E4DFD7] sticky top-0 z-30">
         <div className="flex items-center space-x-2.5 cursor-pointer" onClick={() => setActiveTab('orders')}>
-          <div className="w-8 h-8 rounded-lg bg-[#61564A] flex items-center justify-center text-[#E4DFD7] border border-[#A59B8F]/30">
-            <Gem className="w-4 h-4 text-[#E4DFD7]" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#A59B8F]/30">
+            <img src="/assets/Icono/icono-blanco.jpeg" alt="Logo" className="w-full h-full object-cover" />
           </div>
           <span className="font-extrabold text-sm tracking-wider text-[#E4DFD7] uppercase">
             OBSIDIANA
@@ -119,8 +123,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-5 border-b border-[#61564A]/40 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 cursor-pointer" onClick={() => handleNavClick('orders')}>
-              <div className="w-10 h-10 rounded-xl bg-[#61564A] text-[#E4DFD7] flex items-center justify-center shadow-inner border border-[#A59B8F]/30">
-                <Gem className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-inner border border-[#A59B8F]/30">
+                <img src="/assets/Icono/icono-blanco.jpeg" alt="Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h1 className="font-black text-base tracking-widest text-[#E4DFD7] leading-none uppercase">
@@ -139,19 +143,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <X className="w-5 h-5" />
             </button>
           </div>
-
-          {/* Quick Action Button */}
-          <button
-            id="btn-sidebar-new-order"
-            onClick={() => {
-              onOpenNewOrder();
-              setMobileOpen(false);
-            }}
-            className="w-full bg-[#61564A] hover:bg-[#61564A]/80 text-[#E4DFD7] border border-[#A59B8F]/40 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-md transition-all active:scale-95 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>+ REGISTRAR PEDIDO</span>
-          </button>
         </div>
 
         {/* Navigation Items List */}
@@ -196,6 +187,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Footer Controls */}
         <div className="p-4 border-t border-[#61564A]/40 bg-[#181716] space-y-3">
+          
+          {/* Enlace al Catálogo Público */}
+          <a
+            href="/#catalogo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center space-x-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 py-2.5 px-3 rounded-xl transition-all shadow-md active:scale-95 text-center decoration-transparent"
+          >
+            <span>🔗 VER CATÁLOGO PÚBLICO</span>
+          </a>
+
           {/* Reset Demo Data Button */}
           <button
             onClick={onResetData}

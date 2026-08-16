@@ -43,21 +43,29 @@ body {
   body * {
     visibility: hidden;
   }
+  
   #shipping-label-print-area,
-  #shipping-label-print-area * {
+  #shipping-label-print-area *,
+  #printable-receipt,
+  #printable-receipt * {
     visibility: visible;
   }
-  #shipping-label-print-area {
+  
+  #shipping-label-print-area,
+  #printable-receipt {
     position: absolute;
     left: 0;
     top: 0;
     width: 100% !important;
     max-width: 100% !important;
     box-shadow: none !important;
-    border: 2px solid #000 !important;
     margin: 0 !important;
     padding: 15px !important;
     background: #fff !important;
     color: #000 !important;
+  }
+  
+  #shipping-label-print-area {
+    border: 2px solid #000 !important;
   }
 }

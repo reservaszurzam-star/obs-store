@@ -157,16 +157,16 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
     <div className="space-y-6">
       
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-xl shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-zinc-200 p-5 rounded-sm shadow-sm">
         <div>
-          <h1 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
-            <Gem className="w-5 h-5 text-[#61564A]" />
+          <h1 className="text-lg font-bold text-zinc-900 flex items-center space-x-2">
+            <Gem className="w-5 h-5 text-zinc-800" />
             <span>Inventario de Catálogo Obsidiana</span>
-            <span className="bg-[#61564A]/10 text-[#61564A] text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#61564A]/20">
+            <span className="bg-zinc-800/10 text-zinc-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-zinc-800/20">
               {products.length} Joyas
             </span>
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-zinc-500 mt-1">
             Gestión por secciones (Aretes, Conjuntos, Collares, Pulseras, Anillos), materiales Plata 925/950 y control de existencias.
           </p>
         </div>
@@ -174,7 +174,7 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={onOpenAddProduct}
-            className="bg-[#181716] hover:bg-[#61564A] text-[#E4DFD7] text-xs font-semibold px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer border border-[#61564A]"
+            className="bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold px-4 py-2.5 rounded-sm shadow-sm transition-all flex items-center space-x-2 cursor-pointer border border-zinc-800"
           >
             <Plus className="w-4 h-4" />
             <span>Agregar Joya al Catálogo</span>
@@ -185,92 +185,92 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
       {/* KPI DASHBOARD STATS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
         {/* Total Joyas */}
-        <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs flex flex-col gap-1.5">
+        <div className="bg-white border border-zinc-200 rounded-sm p-3.5 shadow-sm flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Joyas</span>
-            <Gem className="w-4 h-4 text-[#61564A]" />
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Total Joyas</span>
+            <Gem className="w-4 h-4 text-zinc-800" />
           </div>
-          <span className="text-2xl font-black text-slate-900">{kpis.totalProducts}</span>
-          <span className="text-[10px] text-slate-400 font-medium">{kpis.healthyStock} en stock óptimo</span>
+          <span className="text-2xl font-black text-zinc-900">{kpis.totalProducts}</span>
+          <span className="text-[10px] text-zinc-400 font-medium">{kpis.healthyStock} en stock óptimo</span>
         </div>
 
         {/* En Venta / Con Stock */}
         <button
           onClick={() => { setStockStatusFilter('available'); setActiveTab('catalog'); }}
-          className="bg-white border border-emerald-200 rounded-xl p-3.5 shadow-xs flex flex-col gap-1.5 hover:bg-emerald-50/40 transition-colors cursor-pointer text-left"
+          className="bg-white border border-emerald-200 rounded-sm p-3.5 shadow-sm flex flex-col gap-1.5 hover:bg-emerald-50/40 transition-colors cursor-pointer text-left"
           title="Ver joyas disponibles"
         >
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Con Stock</span>
             <PackageCheck className="w-4 h-4 text-emerald-600" />
           </div>
-          <span className="text-2xl font-black text-slate-900">{kpis.inStock}</span>
+          <span className="text-2xl font-black text-zinc-900">{kpis.inStock}</span>
           <span className="text-[10px] text-emerald-600 font-medium">{kpis.totalUnits} unidades totales</span>
         </button>
 
         {/* Agotadas */}
         <button
           onClick={() => { setStockStatusFilter('out'); setActiveTab('catalog'); }}
-          className={`bg-white border rounded-xl p-3.5 shadow-xs flex flex-col gap-1.5 hover:bg-red-50/40 transition-colors cursor-pointer text-left ${
-            kpis.outOfStock > 0 ? 'border-red-200' : 'border-slate-200'
+          className={`bg-white border rounded-sm p-3.5 shadow-sm flex flex-col gap-1.5 hover:bg-red-50/40 transition-colors cursor-pointer text-left ${
+            kpis.outOfStock > 0 ? 'border-red-200' : 'border-zinc-200'
           }`}
           title="Ver joyas agotadas"
         >
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Agotadas</span>
-            <PackageX className={`w-4 h-4 ${kpis.outOfStock > 0 ? 'text-red-600' : 'text-slate-400'}`} />
+            <PackageX className={`w-4 h-4 ${kpis.outOfStock > 0 ? 'text-red-600' : 'text-zinc-400'}`} />
           </div>
-          <span className="text-2xl font-black text-slate-900">{kpis.outOfStock}</span>
-          <span className="text-[10px] text-slate-400 font-medium">Sin existencias</span>
+          <span className="text-2xl font-black text-zinc-900">{kpis.outOfStock}</span>
+          <span className="text-[10px] text-zinc-400 font-medium">Sin existencias</span>
         </button>
 
         {/* Stock Crítico */}
         <button
           onClick={() => { setStockStatusFilter('low'); setActiveTab('catalog'); }}
-          className={`bg-white border rounded-xl p-3.5 shadow-xs flex flex-col gap-1.5 hover:bg-amber-50/40 transition-colors cursor-pointer text-left ${
-            kpis.criticalStock > 0 ? 'border-amber-200' : 'border-slate-200'
+          className={`bg-white border rounded-sm p-3.5 shadow-sm flex flex-col gap-1.5 hover:bg-amber-50/40 transition-colors cursor-pointer text-left ${
+            kpis.criticalStock > 0 ? 'border-amber-200' : 'border-zinc-200'
           }`}
           title="Ver joyas en stock crítico"
         >
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Stock Crítico</span>
-            <TrendingDown className={`w-4 h-4 ${kpis.criticalStock > 0 ? 'text-amber-600' : 'text-slate-400'}`} />
+            <TrendingDown className={`w-4 h-4 ${kpis.criticalStock > 0 ? 'text-amber-600' : 'text-zinc-400'}`} />
           </div>
-          <span className="text-2xl font-black text-slate-900">{kpis.criticalStock}</span>
+          <span className="text-2xl font-black text-zinc-900">{kpis.criticalStock}</span>
           <span className="text-[10px] text-amber-600 font-medium">En o bajo mínimos</span>
         </button>
 
         {/* Unidades Totales */}
-        <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-xs flex flex-col gap-1.5">
+        <div className="bg-white border border-zinc-200 rounded-sm p-3.5 shadow-sm flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Unidades</span>
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Unidades</span>
             <Boxes className="w-4 h-4 text-blue-600" />
           </div>
-          <span className="text-2xl font-black text-slate-900">{kpis.totalUnits}</span>
-          <span className="text-[10px] text-slate-400 font-medium">En almacén / tienda</span>
+          <span className="text-2xl font-black text-zinc-900">{kpis.totalUnits}</span>
+          <span className="text-[10px] text-zinc-400 font-medium">En almacén / tienda</span>
         </div>
 
         {/* Valor de Inventario */}
-        <div className="bg-[#181716] border border-[#61564A] rounded-xl p-3.5 shadow-xs flex flex-col gap-1.5">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-sm p-3.5 shadow-sm flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-[#A59B8F] uppercase tracking-wider">Valor Stock</span>
-            <DollarSign className="w-4 h-4 text-[#A59B8F]" />
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Valor Stock</span>
+            <DollarSign className="w-4 h-4 text-zinc-400" />
           </div>
-          <span className="text-xl font-black text-[#E4DFD7]">
+          <span className="text-xl font-black text-white">
             S/ {kpis.totalValue.toLocaleString('es-PE', { maximumFractionDigits: 2 })}
           </span>
-          <span className="text-[10px] text-[#A59B8F] font-medium">Precio × unidades</span>
+          <span className="text-[10px] text-zinc-400 font-medium">Precio × unidades</span>
         </div>
       </div>
 
       {/* CATEGORY HEALTH SUMMARY */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+      <div className="bg-white border border-zinc-200 rounded-sm p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
-            <Crown className="w-3.5 h-3.5 text-[#61564A]" />
+          <span className="text-xs font-bold text-zinc-800 flex items-center space-x-1.5">
+            <Crown className="w-3.5 h-3.5 text-zinc-800" />
             <span className="uppercase tracking-wider">Salud del Inventario por Sección</span>
           </span>
-          <span className="text-[10px] text-slate-400">% de joyas disponibles en cada categoría</span>
+          <span className="text-[10px] text-zinc-400">% de joyas disponibles en cada categoría</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
@@ -279,26 +279,26 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
               row.availablePct === 100
                 ? 'bg-emerald-500'
                 : row.availablePct >= 60
-                ? 'bg-[#61564A]'
+                ? 'bg-zinc-800'
                 : row.availablePct > 0
                 ? 'bg-amber-500'
                 : 'bg-red-500';
 
             return (
-              <div key={row.cat} className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+              <div key={row.cat} className="bg-zinc-50 border border-zinc-200 rounded-sm p-3">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="font-bold text-[11px] text-slate-800">{row.cat}</span>
-                  <span className="text-[10px] font-bold text-slate-500">
+                  <span className="font-bold text-[11px] text-zinc-800">{row.cat}</span>
+                  <span className="text-[10px] font-bold text-zinc-500">
                     {row.availablePct}% (Disponible: {row.count - row.catOut}/{row.count})
                   </span>
                 </div>
-                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-zinc-200 rounded-full overflow-hidden">
                   <div
                     className={`h-2 rounded-full ${barColor} transition-all duration-500`}
                     style={{ width: `${row.availablePct}%` }}
                   />
                 </div>
-                <div className="flex items-center justify-between mt-1.5 text-[10px] text-slate-400 font-medium">
+                <div className="flex items-center justify-between mt-1.5 text-[10px] text-zinc-400 font-medium">
                   <span>{row.catStock} unidades</span>
                   {row.catOut > 0 && (
                     <span className="text-red-600 font-bold">{row.catOut} agotada{row.catOut > 1 ? 's' : ''}</span>
@@ -312,9 +312,9 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
 
       {/* Low Stock Warning Alert */}
       {lowStockProducts.length > 0 && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-900">
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-900">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-sm bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
@@ -328,7 +328,7 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
           </div>
           <button
             onClick={() => { setStockStatusFilter('low'); setActiveTab('catalog'); }}
-            className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold rounded-lg transition-colors border border-amber-300 shrink-0 cursor-pointer"
+            className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold rounded-sm transition-colors border border-amber-300 shrink-0 cursor-pointer"
           >
             Filtrar Stock Crítico
           </button>
@@ -336,14 +336,14 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
       )}
 
       {/* View Switcher Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 border border-slate-200 rounded-xl shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 border border-zinc-200 rounded-sm shadow-sm">
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setActiveTab('catalog')}
-            className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-2 rounded-sm text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer ${
               activeTab === 'catalog'
-                ? 'bg-[#181716] text-[#E4DFD7] shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                ? 'bg-zinc-900 text-white shadow-sm'
+                : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
             <Package className="w-4 h-4" />
@@ -352,10 +352,10 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
 
           <button
             onClick={() => setActiveTab('movements')}
-            className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-2 rounded-sm text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer ${
               activeTab === 'movements'
-                ? 'bg-[#181716] text-[#E4DFD7] shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                ? 'bg-zinc-900 text-white shadow-sm'
+                : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
             }`}
           >
             <History className="w-4 h-4" />
@@ -364,13 +364,13 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
         </div>
 
         {activeTab === 'catalog' && (
-          <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-lg border border-slate-200 self-start sm:self-auto">
+          <div className="flex items-center space-x-2 bg-zinc-100 p-1 rounded-sm border border-zinc-200 self-start sm:self-auto">
             <button
               onClick={() => setViewMode('sections')}
               className={`px-3 py-1 rounded-md text-xs font-medium flex items-center space-x-1 transition-all cursor-pointer ${
                 viewMode === 'sections'
-                  ? 'bg-white text-slate-900 shadow-xs font-bold'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-white text-zinc-900 shadow-sm font-bold'
+                  : 'text-zinc-500 hover:text-zinc-800'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -380,8 +380,8 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
               onClick={() => setViewMode('table')}
               className={`px-3 py-1 rounded-md text-xs font-medium flex items-center space-x-1 transition-all cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-white text-slate-900 shadow-xs font-bold'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-white text-zinc-900 shadow-sm font-bold'
+                  : 'text-zinc-500 hover:text-zinc-800'
               }`}
             >
               <List className="w-3.5 h-3.5" />
@@ -396,26 +396,26 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
         <div className="space-y-4">
           
           {/* Quick Category Section Pills */}
-          <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
-            <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-semibold">
-              <span className="flex items-center space-x-1 text-slate-700">
-                <Sparkles className="w-3.5 h-3.5 text-[#61564A]" />
+          <div className="bg-white border border-zinc-200 rounded-sm p-3 shadow-sm">
+            <div className="flex items-center justify-between text-xs text-zinc-500 mb-2 font-semibold">
+              <span className="flex items-center space-x-1 text-zinc-700">
+                <Sparkles className="w-3.5 h-3.5 text-zinc-800" />
                 <span>SECCIONES DEL CATÁLOGO</span>
               </span>
-              <span className="text-[11px] text-slate-400">Selecciona para filtrar por categoría</span>
+              <span className="text-[11px] text-zinc-400">Selecciona para filtrar por categoría</span>
             </div>
 
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setCategoryFilter('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center space-x-1.5 ${
+                className={`px-3 py-1.5 rounded-sm text-xs font-bold transition-all cursor-pointer flex items-center space-x-1.5 ${
                   categoryFilter === 'all'
-                    ? 'bg-[#61564A] text-[#E4DFD7] shadow-sm'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                    ? 'bg-zinc-800 text-white shadow-sm'
+                    : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 border border-zinc-200'
                 }`}
               >
                 <span>Todas</span>
-                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${categoryFilter === 'all' ? 'bg-[#181716] text-[#E4DFD7]' : 'bg-slate-200 text-slate-700'}`}>
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${categoryFilter === 'all' ? 'bg-zinc-900 text-white' : 'bg-zinc-200 text-zinc-700'}`}>
                   {products.length}
                 </span>
               </button>
@@ -428,14 +428,14 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                   <button
                     key={cat}
                     onClick={() => setCategoryFilter(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center space-x-1.5 ${
+                    className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-all cursor-pointer flex items-center space-x-1.5 ${
                       isSelected
-                        ? 'bg-[#61564A] text-[#E4DFD7] shadow-sm font-bold'
-                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                        ? 'bg-zinc-800 text-white shadow-sm font-bold'
+                        : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100 border border-zinc-200'
                     }`}
                   >
                     <span>{cat}</span>
-                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${isSelected ? 'bg-[#181716] text-[#E4DFD7]' : 'bg-slate-200/80 text-slate-600'}`}>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${isSelected ? 'bg-zinc-900 text-white' : 'bg-zinc-200/80 text-zinc-600'}`}>
                       {count}
                     </span>
                   </button>
@@ -445,27 +445,27 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
           </div>
 
           {/* Secondary Filters Bar */}
-          <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-white border border-zinc-200 rounded-sm p-3 shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             
             {/* Search Input */}
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3" />
+              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-3" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nombre o SKU..."
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#61564A]"
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-sm pl-9 pr-3 py-2 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-800"
               />
             </div>
 
             {/* Material Filter */}
             <div className="flex items-center space-x-2">
-              <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <Filter className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
               <select
                 value={materialFilter}
                 onChange={(e) => setMaterialFilter(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]"
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-sm px-2.5 py-2 text-xs text-zinc-800 focus:outline-none focus:border-zinc-800"
               >
                 <option value="all">Todos los Materiales</option>
                 {materialsList.map((m) => (
@@ -481,7 +481,7 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
               <select
                 value={stockStatusFilter}
                 onChange={(e) => setStockStatusFilter(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]"
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-sm px-2.5 py-2 text-xs text-zinc-800 focus:outline-none focus:border-zinc-800"
               >
                 <option value="all">Estado de Stock (Todos)</option>
                 <option value="available">Disponibles (Stock {'>'} 0)</option>
@@ -493,11 +493,11 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
 
             {/* Sorting */}
             <div className="flex items-center space-x-2">
-              <ArrowUpDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#61564A]"
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-sm px-2.5 py-2 text-xs text-zinc-800 focus:outline-none focus:border-zinc-800"
               >
                 <option value="name">Ordenar: Nombre A-Z</option>
                 <option value="price-asc">Precio: Menor a Mayor</option>
@@ -514,9 +514,9 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
       {activeTab === 'catalog' && (
         <>
           {filteredProducts.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-xl p-12 text-center text-slate-400 space-y-3">
-              <Package className="w-10 h-10 mx-auto text-slate-300" />
-              <p className="font-semibold text-slate-600">No se encontraron joyas con los filtros seleccionados.</p>
+            <div className="bg-white border border-zinc-200 rounded-sm p-12 text-center text-zinc-400 space-y-3">
+              <Package className="w-10 h-10 mx-auto text-zinc-300" />
+              <p className="font-semibold text-zinc-600">No se encontraron joyas con los filtros seleccionados.</p>
               <button
                 onClick={() => {
                   setSearchQuery('');
@@ -524,7 +524,7 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                   setMaterialFilter('all');
                   setStockStatusFilter('all');
                 }}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors border border-slate-200 cursor-pointer"
+                className="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-sm transition-colors border border-zinc-200 cursor-pointer"
               >
                 Limpiar Filtros
               </button>
@@ -533,27 +533,27 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
             /* SECTIONS VIEW MODE */
             <div className="space-y-6">
               {(Object.entries(groupedProducts) as [string, Product[]][]).map(([catName, catProducts]) => (
-                <div key={catName} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                <div key={catName} className="bg-white border border-zinc-200 rounded-sm overflow-hidden shadow-sm">
                   
                   {/* Category Header */}
-                  <div className="bg-[#181716] text-[#E4DFD7] px-5 py-3.5 flex items-center justify-between">
+                  <div className="bg-zinc-900 text-white px-5 py-3.5 flex items-center justify-between">
                     <div className="flex items-center space-x-2.5">
-                      <Gem className="w-4 h-4 text-[#A59B8F]" />
+                      <Gem className="w-4 h-4 text-zinc-400" />
                       <h2 className="font-extrabold text-sm uppercase tracking-wider">
                         {catName}
                       </h2>
-                      <span className="bg-[#61564A] text-[#E4DFD7] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#A59B8F]/30">
+                      <span className="bg-zinc-800 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-zinc-/30">
                         {catProducts.length} productos
                       </span>
                     </div>
 
-                    <div className="text-[11px] text-[#A59B8F] font-medium hidden sm:block">
+                    <div className="text-[11px] text-zinc-400 font-medium hidden sm:block">
                       Obsidiana Catálogo 2026
                     </div>
                   </div>
 
                   {/* Products Grid in Section */}
-                  <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 bg-slate-50/50">
+                  <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 bg-zinc-50/50">
                     {catProducts.map((p) => {
                       const isLowStock = p.stock <= p.minStock && p.stock > 0;
                       const isOutStock = p.stock <= 0;
@@ -561,28 +561,28 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                       return (
                         <div
                           key={p.id}
-                          className="group relative bg-white border border-slate-200 hover:border-[#61564A]/40 rounded-2xl overflow-hidden shadow-xs transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                          className="group relative bg-white border border-zinc-200 hover:border-zinc-800/40 rounded-sm overflow-hidden shadow-sm transition-all duration-300 hover:shadow-lg hover:-tranzinc-y-0.5"
                         >
                           {/* Decorative top gradient accent */}
-                          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#161716] via-[#61564A] to-[#A59B8F] opacity-80" />
+                          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#161716] via-zinc-800] to-zinc-400] opacity-80" />
 
                           {/* Product content */}
                           <div className="p-4">
                             {/* Top row: category badge + price */}
                             <div className="flex items-center justify-between mb-3">
-                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#E4DFD7] text-[#161716] border border-[#61564A]/20">
-                                <Gem className="w-3 h-3 text-[#61564A]" />
+                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-white text-[#161716] border border-zinc-800/20">
+                                <Gem className="w-3 h-3 text-zinc-800" />
                                 <span>{p.category}</span>
                               </span>
 
-                              <span className="font-black text-sm text-[#161716] bg-gradient-to-br from-slate-50 to-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 transition-transform group-hover:scale-105">
+                              <span className="font-black text-sm text-[#161716] bg-gradient-to-br from-zinc-50 to-zinc-100 px-2.5 py-1 rounded-sm border border-zinc-200 transition-transform group-hover:scale-105">
                                 S/ {p.price.toFixed(2)}
                               </span>
                             </div>
 
                             {/* Name + SKU */}
                             <div className="mb-3">
-                              <h3 className="font-bold text-[13px] text-slate-900 leading-snug mb-1">
+                              <h3 className="font-bold text-[13px] text-zinc-900 leading-snug mb-1">
                                 {p.name}
                               </h3>
                               <span className="font-mono text-[10px] text-blue-600 font-semibold bg-blue-50/60 px-1.5 py-0.5 rounded inline-block border border-blue-100">
@@ -591,8 +591,8 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                             </div>
 
                             {/* Location */}
-                            <div className="flex items-center space-x-1 text-[11px] text-slate-500 mb-4 pb-3 border-b border-dashed border-slate-200">
-                              <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                            <div className="flex items-center space-x-1 text-[11px] text-zinc-500 mb-4 pb-3 border-b border-dashed border-zinc-200">
+                              <MapPin className="w-3 h-3 text-zinc-400 shrink-0" />
                               <span className="truncate">{p.location}</span>
                             </div>
 
@@ -600,17 +600,17 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                             <div className="flex items-center justify-between gap-2">
                               <div>
                                 {isOutStock ? (
-                                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 shadow-xs">
+                                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 shadow-sm">
                                     <XCircle className="w-3 h-3" />
                                     <span>Agotado</span>
                                   </span>
                                 ) : isLowStock ? (
-                                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-xs">
+                                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
                                     <AlertTriangle className="w-3 h-3" />
                                     <span>Stock Bajo ({p.stock})</span>
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-xs">
+                                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-sm">
                                     <CheckCircle2 className="w-3 h-3" />
                                     <span>Stock: {p.stock} un.</span>
                                   </span>
@@ -619,7 +619,7 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
 
                               <button
                                 onClick={() => onOpenAdjustStock(p)}
-                                className="px-3 py-1.5 bg-[#161716] hover:bg-[#61564A] text-[#E4DFD7] rounded-lg text-[11px] font-semibold transition-all border border-[#61564A]/40 shadow-sm active:scale-95 cursor-pointer"
+                                className="px-3 py-1.5 bg-[#161716] hover:bg-zinc-800 text-white rounded-sm text-[11px] font-semibold transition-all border border-zinc-800/40 shadow-sm active:scale-95 cursor-pointer"
                               >
                                 +/- Stock
                               </button>
@@ -635,11 +635,11 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
             </div>
           ) : (
             /* COMPACT TABLE MODE */
-            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+            <div className="bg-white border border-zinc-200 rounded-sm overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <tr className="bg-zinc-50 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                       <th className="py-3 px-4">Producto & SKU</th>
                       <th className="py-3 px-4">Categoría</th>
                       <th className="py-3 px-4">Material / Ubicación</th>
@@ -649,38 +649,38 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                     </tr>
                   </thead>
 
-                  <tbody className="divide-y divide-slate-100 text-xs text-slate-600">
+                  <tbody className="divide-y divide-zinc-100 text-xs text-zinc-600">
                     {filteredProducts.map((p) => {
                       const isLowStock = p.stock <= p.minStock && p.stock > 0;
                       const isOutStock = p.stock <= 0;
 
                       return (
-                        <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={p.id} className="hover:bg-zinc-50/80 transition-colors">
                           <td className="py-3.5 px-4">
-                            <div className="font-semibold text-slate-900">{p.name}</div>
+                            <div className="font-semibold text-zinc-900">{p.name}</div>
                             <div className="font-mono text-[11px] text-blue-600">{p.sku}</div>
                           </td>
 
                           <td className="py-3.5 px-4">
-                            <span className="bg-slate-100 px-2 py-0.5 rounded text-[11px] font-semibold text-slate-700 border border-slate-200">
+                            <span className="bg-zinc-100 px-2 py-0.5 rounded text-[11px] font-semibold text-zinc-700 border border-zinc-200">
                               {p.category}
                             </span>
                           </td>
 
-                          <td className="py-3.5 px-4 text-slate-500">
-                            <div className="flex items-center space-x-1 text-slate-700">
-                              <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <td className="py-3.5 px-4 text-zinc-500">
+                            <div className="flex items-center space-x-1 text-zinc-700">
+                              <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                               <span>{p.location}</span>
                             </div>
                           </td>
 
-                          <td className="py-3.5 px-4 font-bold text-slate-900">
+                          <td className="py-3.5 px-4 font-bold text-zinc-900">
                             S/ {p.price.toFixed(2)}
                           </td>
 
                           <td className="py-3.5 px-4">
                             <div className="flex items-center space-x-2">
-                              <span className="font-bold text-sm text-slate-900">{p.stock}</span>
+                              <span className="font-bold text-sm text-zinc-900">{p.stock}</span>
                               {isOutStock ? (
                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">
                                   Sin Stock
@@ -700,7 +700,7 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                           <td className="py-3.5 px-4 text-right">
                             <button
                               onClick={() => onOpenAdjustStock(p)}
-                              className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold border border-slate-200 transition-colors cursor-pointer"
+                              className="px-3 py-1.5 bg-white hover:bg-zinc-50 text-zinc-700 rounded-sm text-xs font-semibold border border-zinc-200 transition-colors cursor-pointer"
                             >
                               + / - Stock
                             </button>
@@ -718,11 +718,11 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
 
       {/* Stock Movements Log Tab */}
       {activeTab === 'movements' && (
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+        <div className="bg-white border border-zinc-200 rounded-sm overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <tr className="bg-zinc-50 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                   <th className="py-3 px-4">Fecha & Hora</th>
                   <th className="py-3 px-4">Joya / Producto</th>
                   <th className="py-3 px-4">Tipo</th>
@@ -732,20 +732,20 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-100 text-xs text-slate-600">
+              <tbody className="divide-y divide-zinc-100 text-xs text-zinc-600">
                 {stockMovements.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-400">
+                    <td colSpan={6} className="py-12 text-center text-zinc-400">
                       No hay movimientos de inventario registrados.
                     </td>
                   </tr>
                 ) : (
                   stockMovements.map((m) => (
-                    <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3.5 px-4 text-slate-400">
+                    <tr key={m.id} className="hover:bg-zinc-50/80 transition-colors">
+                      <td className="py-3.5 px-4 text-zinc-400">
                         {new Date(m.timestamp).toLocaleString('es-PE')}
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-slate-800">
+                      <td className="py-3.5 px-4 font-semibold text-zinc-800">
                         {m.productName}
                       </td>
                       <td className="py-3.5 px-4">
@@ -765,19 +765,19 @@ export const InventoryModule: React.FC<InventoryModuleProps> = ({
                             <span>Alerta</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200">
                             <RotateCcw className="w-3 h-3" />
                             <span>Ajuste</span>
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 font-bold text-slate-900">
+                      <td className="py-3.5 px-4 font-bold text-zinc-900">
                         {m.type === 'in' ? `+${m.quantity}` : m.type === 'out' ? `-${m.quantity}` : m.type === 'alert' ? '⚠' : `${m.quantity}`}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600">
+                      <td className="py-3.5 px-4 text-zinc-600">
                         {m.reason}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-400 font-mono text-[11px]">
+                      <td className="py-3.5 px-4 text-zinc-400 font-mono text-[11px]">
                         {m.performedBy}
                       </td>
                     </tr>

@@ -11,6 +11,15 @@ import {
   INITIAL_EMAIL_LOGS,
 } from "./src/data/mockData";
 import { Product, Province, District, Zone, Order, StockMovement, EmailLog, OrderStatus } from "./src/types";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_EMAIL || 'reservaszurzam@gmail.com',
+    pass: 'pwtw hipa paoj cvdq'
+  }
+});
 
 // In-Memory Database Store
 let dbProducts: Product[] = [...INITIAL_PRODUCTS];
@@ -30,6 +39,22 @@ function generateTrackingCode(): string {
 function generateOrderNumber(): string {
   const num = dbOrders.length + 93;
   return `PED-2026-${num.toString().padStart(4, '0')}`;
+}
+
+async function sendEmail(emailLog: EmailLog) {
+  try {
+    const info = await transporter.sendMail({
+      from: `"Obsidiana Joyería" <${process.env.SMTP_EMAIL || 'reservaszurzam@gmail.com'}>`,
+      to: emailLog.recipientEmail,
+      subject: emailLog.subject,
+      html: emailLog.bodyHtml,
+    });
+    console.log(`Email sent: ${info.messageId}`);
+    emailLog.status = 'sent';
+  } catch (error) {
+    console.error('Error sending email:', error);
+    emailLog.status = 'failed';
+  }
 }
 
 async function startServer() {
@@ -144,7 +169,7 @@ async function startServer() {
           templateType = "order_dispatched";
         }
 
-        dbEmailLogs.unshift({
+        const autoEmailLog: EmailLog = {
           id: `email-auto-${Date.now()}-${order.id}`,
           orderId: order.id,
           trackingCode: order.trackingCode,
@@ -166,7 +191,9 @@ async function startServer() {
               <p style="font-size:12px;color:#64748b;">Notificación automática · Obsidiana Joyería Perú</p>
             </div>
           `,
-        });
+        };
+        dbEmailLogs.unshift(autoEmailLog);
+        sendEmail(autoEmailLog);
       }
     });
 
@@ -313,6 +340,7 @@ async function startServer() {
       };
 
       dbEmailLogs.unshift(emailNotification);
+      sendEmail(emailNotification);
 
       res.status(201).json({ order: newOrder, email: emailNotification, products: dbProducts });
     } catch (err: any) {
@@ -393,6 +421,7 @@ async function startServer() {
     };
 
     dbEmailLogs.unshift(emailLog);
+    sendEmail(emailLog);
 
     res.json({ order, email: emailLog });
   });

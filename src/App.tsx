@@ -5,6 +5,7 @@ import { PosModule } from './components/PosModule';
 import { OrderRegistrationModal } from './components/OrderRegistrationModal';
 import { OrderDetailModal } from './components/OrderDetailModal';
 import { InventoryModule } from './components/InventoryModule';
+import { PublicCatalog } from './components/PublicCatalog';
 import { AddProductModal } from './components/AddProductModal';
 import { StockMovementModal } from './components/StockMovementModal';
 import { ShippingZonesModule } from './components/ShippingZonesModule';
@@ -12,6 +13,7 @@ import { AddZoneModal } from './components/AddZoneModal';
 import { TrackingModule } from './components/TrackingModule';
 import { ReportsModule } from './components/ReportsModule';
 import { EmailNotificationsModule } from './components/EmailNotificationsModule';
+import { ClientsModule } from './components/ClientsModule';
 import { 
   Product, 
   Province, 
@@ -34,7 +36,7 @@ import {
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails'>('pos');
+  const [activeTab, setActiveTab] = useState<'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails' | 'clients'>('pos');
 
   // Backend state (initialized with local data so the deployed/static version
   // shows the full catalog even when the Express backend is not running)
@@ -50,6 +52,9 @@ export default function App() {
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+
+  // Nuevo estado para catálogo público
+  const [isPublicCatalog, setIsPublicCatalog] = useState(() => window.location.hash === '#catalogo');
   const [adjustStockProduct, setAdjustStockProduct] = useState<Product | null>(null);
   const [isAddZoneOpen, setIsAddZoneOpen] = useState(false);
   const [trackingCodeForSearch, setTrackingCodeForSearch] = useState('');
@@ -85,6 +90,13 @@ export default function App() {
 
   useEffect(() => {
     loadInitialData();
+
+    // Escuchar cambios en el hash de la URL
+    const handleHashChange = () => {
+      setIsPublicCatalog(window.location.hash === '#catalogo');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   // --- API HANDLERS ---
@@ -283,6 +295,11 @@ export default function App() {
   const pendingOrdersCount = orders.filter((o) => o.status === 'pendiente' || o.status === 'en_preparacion').length;
   const lowStockCount = products.filter((p) => p.stock <= p.minStock).length;
 
+  // Si es la vista pública, renderizar SOLAMENTE el catálogo virtual
+  if (isPublicCatalog) {
+    return <PublicCatalog products={products} />;
+  }
+
   return (
     <div className="min-h-screen bg-[#E4DFD7] text-[#181716] flex flex-col md:flex-row font-sans selection:bg-[#61564A] selection:text-[#E4DFD7]">
       
@@ -304,7 +321,6 @@ export default function App() {
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onOpenNewOrder={() => setIsNewOrderOpen(true)}
         onResetData={handleResetData}
         pendingOrdersCount={pendingOrdersCount}
         lowStockCount={lowStockCount}
@@ -375,6 +391,10 @@ export default function App() {
               emailLogs={emailLogs}
               onSendTestEmail={handleSendTestEmail}
             />
+          )}
+
+          {activeTab === 'clients' && (
+            <ClientsModule orders={orders} />
           )}
         </main>
 

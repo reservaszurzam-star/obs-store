@@ -62,15 +62,15 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
     <div className="space-y-6">
       
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-xl shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-zinc-200 p-5 rounded-sm shadow-sm">
         <div>
-          <h1 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <h1 className="text-lg font-bold text-zinc-900 flex items-center space-x-2">
             <span>Módulo de Notificaciones por Correo Electrónico</span>
             <span className="bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full border border-blue-200">
               {emailLogs.length} Correos Enviados
             </span>
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-zinc-500 mt-1">
             Registro auditable de correos automáticos enviados a los clientes por cambios de estado de sus pedidos.
           </p>
         </div>
@@ -79,9 +79,9 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left 2 Cols: Email Logs Table */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-          <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-900 flex items-center space-x-2">
+        <div className="lg:col-span-2 bg-white border border-zinc-200 rounded-sm overflow-hidden shadow-sm">
+          <div className="p-4 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-zinc-900 flex items-center space-x-2">
               <FileText className="w-4 h-4 text-blue-600" />
               <span>Historial de Correos Disparados</span>
             </h3>
@@ -90,7 +90,7 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <tr className="bg-zinc-50 border-b border-zinc-200 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                   <th className="py-3 px-4">Fecha / Hora</th>
                   <th className="py-3 px-4">Destinatario</th>
                   <th className="py-3 px-4">Asunto / Tipo</th>
@@ -99,17 +99,17 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody className="divide-y divide-zinc-100 text-xs">
                 {emailLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-slate-400">
+                    <td colSpan={5} className="py-8 text-center text-zinc-400">
                       No hay correos registrados todavía.
                     </td>
                   </tr>
                 ) : (
                   emailLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">
+                    <tr key={log.id} className="hover:bg-zinc-50 transition-colors">
+                      <td className="py-3.5 px-4 text-zinc-500 font-mono text-[11px]">
                         {new Date(log.sentAt).toLocaleString('es-PE', {
                           day: '2-digit',
                           month: 'short',
@@ -119,12 +119,12 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
                       </td>
 
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-slate-900">{log.recipientName}</div>
-                        <div className="text-[11px] text-slate-500">{log.recipientEmail}</div>
+                        <div className="font-semibold text-zinc-900">{log.recipientName}</div>
+                        <div className="text-[11px] text-zinc-500">{log.recipientEmail}</div>
                       </td>
 
                       <td className="py-3.5 px-4">
-                        <div className="text-slate-800 font-medium truncate max-w-[200px]">{log.subject}</div>
+                        <div className="text-zinc-800 font-medium truncate max-w-[200px]">{log.subject}</div>
                         <span className="text-[10px] text-blue-600 font-mono">
                           {log.trackingCode}
                         </span>
@@ -140,7 +140,7 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
                       <td className="py-3.5 px-4 text-right">
                         <button
                           onClick={() => setSelectedEmail(log)}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium border border-slate-200 transition-colors flex items-center space-x-1 ml-auto"
+                          className="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-sm text-xs font-medium border border-zinc-200 transition-colors flex items-center space-x-1 ml-auto"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Previsualizar</span>
@@ -156,14 +156,14 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
 
         {/* Right Col: Send Test Custom Email Box */}
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 p-5 rounded-xl space-y-4 shadow-xs">
+          <div className="bg-white border border-zinc-200 p-5 rounded-sm space-y-4 shadow-sm">
             <h3 className="text-xs font-bold text-blue-600 uppercase tracking-wider flex items-center space-x-1.5">
               <Send className="w-4 h-4" />
               <span>Simulador de Envío de Correo</span>
             </h3>
 
             {statusMsg && (
-              <div className="p-3 bg-blue-50 border border-blue-200 text-blue-700 text-xs rounded-lg flex items-center space-x-2">
+              <div className="p-3 bg-blue-50 border border-blue-200 text-blue-700 text-xs rounded-sm flex items-center space-x-2">
                 <CheckCircle2 className="w-4 h-4 shrink-0 text-blue-600" />
                 <span>{statusMsg}</span>
               </div>
@@ -171,42 +171,42 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
 
             <form onSubmit={handleSendTest} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Nombre Destinatario</label>
+                <label className="block text-xs font-medium text-zinc-700 mb-1">Nombre Destinatario</label>
                 <input
                   type="text"
                   required
                   value={testName}
                   onChange={(e) => setTestName(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600"
+                  className="w-full bg-white border border-zinc-200 rounded-sm px-3 py-1.5 text-xs text-zinc-800 focus:outline-none focus:border-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Correo Electrónico *</label>
+                <label className="block text-xs font-medium text-zinc-700 mb-1">Correo Electrónico *</label>
                 <input
                   type="email"
                   required
                   value={testEmail}
                   onChange={(e) => setTestEmail(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600"
+                  className="w-full bg-white border border-zinc-200 rounded-sm px-3 py-1.5 text-xs text-zinc-800 focus:outline-none focus:border-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Asunto del Correo *</label>
+                <label className="block text-xs font-medium text-zinc-700 mb-1">Asunto del Correo *</label>
                 <input
                   type="text"
                   required
                   value={testSubject}
                   onChange={(e) => setTestSubject(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600"
+                  className="w-full bg-white border border-zinc-200 rounded-sm px-3 py-1.5 text-xs text-zinc-800 focus:outline-none focus:border-blue-600"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSending}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-xs shadow-xs disabled:opacity-50 transition-all flex items-center justify-center space-x-2"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-sm text-xs shadow-sm disabled:opacity-50 transition-all flex items-center justify-center space-x-2"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{isSending ? 'Enviando Correo...' : 'Probar Envío de Correo'}</span>
@@ -219,30 +219,30 @@ export const EmailNotificationsModule: React.FC<EmailNotificationsModuleProps> =
 
       {/* HTML Email Preview Drawer/Modal */}
       {selectedEmail && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-xl w-full max-w-2xl shadow-xl text-slate-800 overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-zinc-200 rounded-sm w-full max-w-2xl shadow-xl text-zinc-800 overflow-hidden flex flex-col">
             
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Vista Previa de Correo Enviado</h2>
-                <p className="text-xs text-slate-500">Para: {selectedEmail.recipientName} ({selectedEmail.recipientEmail})</p>
+                <h2 className="text-base font-bold text-zinc-900">Vista Previa de Correo Enviado</h2>
+                <p className="text-xs text-zinc-500">Para: {selectedEmail.recipientName} ({selectedEmail.recipientEmail})</p>
               </div>
               <button
                 onClick={() => setSelectedEmail(null)}
-                className="text-slate-400 hover:text-slate-600 p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                className="text-zinc-400 hover:text-zinc-600 p-2 rounded-sm hover:bg-zinc-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto bg-white text-slate-900 min-h-[300px]">
+            <div className="p-6 overflow-y-auto bg-white text-zinc-900 min-h-[300px]">
               <div dangerouslySetInnerHTML={{ __html: selectedEmail.bodyHtml }} />
             </div>
 
-            <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+            <div className="px-6 py-3 bg-zinc-50 border-t border-zinc-100 flex justify-end">
               <button
                 onClick={() => setSelectedEmail(null)}
-                className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium"
+                className="px-4 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-sm text-xs font-medium"
               >
                 Cerrar Vista Previa
               </button>

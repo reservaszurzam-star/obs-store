@@ -8,6 +8,8 @@ export interface Product {
   minStock: number;
   location: string;
   updatedAt: string;
+  imageUrl?: string;
+  hoverImageUrl?: string;
 }
 
 export interface StockMovement {
