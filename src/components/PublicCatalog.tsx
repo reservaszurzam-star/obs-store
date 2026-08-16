@@ -151,20 +151,7 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
         </div>
         
         {/* Gradient Fade to background color */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFCFB] via-[#FDFCFB]/40 to-transparent"></div>
-
-        {/* Hero Editorial Overlaid at bottom */}
-        <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 px-6 text-center z-10">
-          <div className="max-w-4xl mx-auto space-y-6">
-            <h2 className="text-4xl md:text-6xl font-light text-[#181716] tracking-tighter drop-shadow-sm">
-              Elegancia <span className="italic font-serif text-[#61564A]">Atemporal</span>
-            </h2>
-            <p className="max-w-xl mx-auto text-[#4A4238] font-medium leading-relaxed text-sm md:text-base">
-              Descubre nuestra selección curada de piezas en Plata 925 y 950. 
-              Diseños creados para resaltar tu esencia en cada momento.
-            </p>
-          </div>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFCFB] via-[#FDFCFB]/20 to-transparent"></div>
       </div>
 
       {/* Filtros y Búsqueda Refinados */}
