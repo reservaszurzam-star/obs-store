@@ -12,8 +12,10 @@ import {
   X,
   Gem,
   Store,
-  Users
+  Users,
+  LogOut
 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface SidebarProps {
   activeTab: 'orders' | 'pos' | 'inventory' | 'shipping' | 'tracking' | 'reports' | 'emails' | 'clients';
@@ -201,10 +203,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Reset Demo Data Button */}
           <button
             onClick={onResetData}
-            className="w-full flex items-center justify-center space-x-2 text-xs font-semibold text-[#A59B8F] hover:text-[#E4DFD7] bg-[#181716] hover:bg-[#61564A]/40 border border-[#61564A]/60 py-2.5 px-3 rounded-xl transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center space-x-2 text-xs font-semibold text-[#A59B8F] hover:text-[#E4DFD7] bg-[#181716] hover:bg-[#61564A]/40 border border-[#61564A]/60 py-2.5 px-3 rounded-xl transition-colors cursor-pointer mb-2"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Restablecer Datos</span>
+          </button>
+
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+            }}
+            className="w-full flex items-center justify-center space-x-2 text-xs font-semibold text-red-400 hover:text-red-300 bg-[#181716] hover:bg-red-950/40 border border-red-900/60 py-2.5 px-3 rounded-xl transition-colors cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Cerrar Sesión</span>
           </button>
 
           <p className="text-[10px] text-center text-[#A59B8F]/80">
