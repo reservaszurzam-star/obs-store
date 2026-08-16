@@ -9,6 +9,9 @@ export interface ProductoDB {
   material: string;
   precio: number;
   stock: number;
+  stock_minimo?: number;
+  sku?: string;
+  ubicacion?: string;
   descripcion?: string;
   imagen_url?: string;
   peso_gramos?: number;

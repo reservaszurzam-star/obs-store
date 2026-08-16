@@ -216,20 +216,23 @@ export default function App() {
 
   // 3. Add Product
   const handleAddProduct = async (productData: any) => {
-    const res = await fetch('/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(productData),
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Error al agregar producto');
+    try {
+      await productosService.create({
+        nombre: productData.name,
+        categoria: productData.category,
+        precio: productData.price,
+        stock: productData.stock,
+        stock_minimo: productData.minStock,
+        sku: productData.sku,
+        material: 'Plata 950',
+        activo: true
+      });
+      showToast(`¡Producto "${productData.name}" agregado con éxito a Supabase!`);
+      loadInitialData(); // reload from DB
+    } catch (err: any) {
+      console.error(err);
+      throw new Error(err.message || 'Error al agregar producto en Supabase');
     }
-
-    const newProd = await res.json();
-    setProducts((prev) => [newProd, ...prev]);
-    showToast(`Producto "${newProd.name}" agregado al inventario.`);
   };
 
   // 4. Adjust Stock
@@ -240,21 +243,22 @@ export default function App() {
     reason: string,
     performedBy: string
   ) => {
-    const res = await fetch(`/api/products/${productId}/adjust-stock`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quantity, type, reason, performedBy }),
-    });
+    try {
+      const product = products.find(p => p.id === productId);
+      if (!product) throw new Error('Producto no encontrado');
+      
+      let newStock = product.stock;
+      if (type === 'in') newStock += quantity;
+      if (type === 'out') newStock -= quantity;
+      if (type === 'adjustment') newStock = quantity;
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Error al ajustar stock');
+      await productosService.updateStock(productId, newStock);
+      showToast(`¡Stock actualizado en Supabase para "${product.name}"!`);
+      loadInitialData(); // reload from DB
+    } catch (err: any) {
+      console.error(err);
+      throw new Error(err.message || 'Error al ajustar stock');
     }
-
-    const data = await res.json();
-    setProducts((prev) => prev.map((p) => (p.id === productId ? data.product : p)));
-    setStockMovements((prev) => [data.movement, ...prev]);
-    showToast(`Stock actualizado para "${data.product.name}" (Nuevo stock: ${data.product.stock}).`);
   };
 
   // 5. Add Zone
