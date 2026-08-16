@@ -255,7 +255,7 @@ export const configService = {
     const { data, error } = await supabase
       .from('zonas')
       .select('*')
-      .eq('activo', true)
+      .eq('estado', 'active')
       .order('nombre');
     if (error) throw error;
     return data ?? [];
@@ -265,7 +265,6 @@ export const configService = {
     const { data, error } = await supabase
       .from('provincias')
       .select('*')
-      .eq('activo', true)
       .order('nombre');
     if (error) throw error;
     return data ?? [];
