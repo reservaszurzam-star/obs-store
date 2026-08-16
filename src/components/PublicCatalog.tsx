@@ -139,25 +139,31 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
         </div>
       </nav>
 
-      {/* Full-Bleed Banner */}
-      <div className="w-full pt-20 bg-[#FDFCFB]">
-        <img 
-          src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
-          alt="Obsidiana Nueva Colección" 
-          className="w-full h-auto object-cover"
-        />
-      </div>
+      {/* Full-Bleed Hero Banner with Gradient Fade */}
+      <div className="relative w-full h-[65vh] md:h-[75vh] min-h-[500px]">
+        {/* Background Image */}
+        <div className="absolute inset-0 w-full h-full">
+          <img 
+            src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
+            alt="Obsidiana Nueva Colección" 
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+        
+        {/* Gradient Fade to background color */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFCFB] via-[#FDFCFB]/40 to-transparent"></div>
 
-      {/* Hero Section Editorial */}
-      <div className="pt-16 pb-10 px-6">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h2 className="text-4xl md:text-5xl font-light text-[#181716] tracking-tighter">
-            Elegancia <span className="italic font-serif text-[#61564A]">Atemporal</span>
-          </h2>
-          <p className="max-w-xl mx-auto text-[#61564A] font-light leading-relaxed text-sm md:text-base">
-            Descubre nuestra selección curada de piezas en Plata 925 y 950. 
-            Diseños creados para resaltar tu esencia en cada momento.
-          </p>
+        {/* Hero Editorial Overlaid at bottom */}
+        <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 px-6 text-center z-10">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <h2 className="text-4xl md:text-6xl font-light text-[#181716] tracking-tighter drop-shadow-sm">
+              Elegancia <span className="italic font-serif text-[#61564A]">Atemporal</span>
+            </h2>
+            <p className="max-w-xl mx-auto text-[#4A4238] font-medium leading-relaxed text-sm md:text-base">
+              Descubre nuestra selección curada de piezas en Plata 925 y 950. 
+              Diseños creados para resaltar tu esencia en cada momento.
+            </p>
+          </div>
         </div>
       </div>
 
