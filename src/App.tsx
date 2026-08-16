@@ -79,19 +79,81 @@ export default function App() {
   // Bootstrap initial data
   const loadInitialData = async () => {
     try {
-      const res = await fetch('/api/bootstrap');
-      if (res.ok) {
-        const data = await res.json();
-        setProducts(data.products || []);
-        setProvinces(data.provinces || []);
-        setDistricts(data.districts || []);
-        setZones(data.zones || []);
-        setOrders(data.orders || []);
-        setStockMovements(data.stockMovements || []);
-        setEmailLogs(data.emailLogs || []);
-      }
+      const [dbProductos, dbZonas, dbProvincias, dbPedidos] = await Promise.all([
+        productosService.getAll(),
+        configService.getZonas(),
+        configService.getProvincias(),
+        pedidosService.getAll()
+      ]);
+
+      const mappedProducts: Product[] = dbProductos.map((p: any) => ({
+        id: p.id,
+        sku: p.sku || 'N/A',
+        name: p.nombre,
+        category: p.categoria,
+        price: Number(p.precio),
+        stock: p.stock,
+        minStock: p.stock_minimo || 5,
+        location: p.ubicacion || 'Almacén',
+        updatedAt: p.updated_at,
+        imageUrl: p.imagen_url || (p.sku ? \`/productos/\${p.sku.toLowerCase().replace('obs-', 'prod-')}.jpeg\` : undefined),
+        hoverImageUrl: p.sku ? \`/productos/\${p.sku.toLowerCase().replace('obs-', 'prod-')}-hover.jpeg\` : undefined,
+      }));
+
+      const mappedOrders: Order[] = dbPedidos.map((p: any) => ({
+        id: p.id,
+        orderNumber: p.numero_pedido || p.numero_nota,
+        trackingCode: p.codigo_tracking,
+        customer: {
+          name: p.cliente_nombre,
+          email: p.cliente_email || '',
+          phone: p.cliente_telefono || '',
+          address: p.cliente_direccion || '',
+          province: p.cliente_provincia || '',
+          district: p.cliente_distrito || '',
+          zone: p.cliente_zona || '',
+          notes: p.cliente_notas || '',
+        },
+        items: p.pedido_items ? p.pedido_items.map((i: any) => ({
+          productId: i.producto_id,
+          productName: i.producto_nombre,
+          sku: i.sku || '',
+          quantity: i.cantidad,
+          unitPrice: Number(i.precio_unitario),
+          total: Number(i.total),
+        })) : [],
+        subtotal: Number(p.subtotal),
+        shippingFee: Number(p.tarifa_envio || 0),
+        total: Number(p.total),
+        status: p.estado as OrderStatus,
+        createdAt: p.created_at,
+        updatedAt: p.updated_at,
+        estimatedDelivery: p.entrega_estimada || '',
+        paymentMethod: p.metodo_pago,
+        timeline: [],
+      }));
+
+      // Siempre usamos los datos de Supabase, aunque estén vacíos
+      setProducts(mappedProducts);
+      setProvinces(dbProvincias.length > 0 ? dbProvincias : INITIAL_PROVINCES);
+      setZones(dbZonas.length > 0 ? dbZonas : INITIAL_ZONES);
+      setOrders(mappedOrders);
+
+      // Distritos/Stock local
+      setDistricts(INITIAL_DISTRICTS);
+      setStockMovements(INITIAL_STOCK_MOVEMENTS);
+      setEmailLogs(INITIAL_EMAIL_LOGS);
+
     } catch (err) {
-      console.error('Error cargando datos iniciales:', err);
+      console.error('Error cargando datos desde Supabase:', err);
+      // Fallback a INITIAL si la base de datos falla
+      setProducts(INITIAL_PRODUCTS);
+      setProvinces(INITIAL_PROVINCES);
+      setDistricts(INITIAL_DISTRICTS);
+      setZones(INITIAL_ZONES);
+      setOrders(INITIAL_ORDERS);
+      setStockMovements(INITIAL_STOCK_MOVEMENTS);
+      setEmailLogs(INITIAL_EMAIL_LOGS);
     }
   };
 
