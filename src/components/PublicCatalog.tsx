@@ -139,19 +139,13 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
         </div>
       </nav>
 
-      {/* Full-Bleed Hero Banner with Gradient Fade */}
-      <div className="relative w-full h-[65vh] md:h-[75vh] min-h-[500px]">
-        {/* Background Image */}
-        <div className="absolute inset-0 w-full h-full">
-          <img 
-            src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
-            alt="Obsidiana Nueva Colección" 
-            className="w-full h-full object-cover object-center"
-          />
-        </div>
-        
-        {/* Gradient Fade to background color */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FDFCFB] via-[#FDFCFB]/20 to-transparent"></div>
+      {/* Full-Bleed Hero Banner (No Gradient) */}
+      <div className="w-full pt-20 bg-[#FDFCFB]">
+        <img 
+          src="/LOGO%20PRINCIPAL/BANNER%20PRINCIPAL.png" 
+          alt="Obsidiana Banner Principal" 
+          className="w-full h-auto object-contain block"
+        />
       </div>
 
       {/* Filtros y Búsqueda Refinados */}
