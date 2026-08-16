@@ -55,7 +55,7 @@ export default function App() {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
 
   // Nuevo estado para catálogo público
-  const [isAdminRoute, setIsAdminRoute] = useState(() => window.location.hash === '#admin');
+  const [isAdminRoute, setIsAdminRoute] = useState(() => window.location.hash === '#rubenasmat');
   const [session, setSession] = useState<any>(null);
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
@@ -110,7 +110,7 @@ export default function App() {
 
     // Escuchar cambios en el hash de la URL
     const handleHashChange = () => {
-      setIsAdminRoute(window.location.hash === '#admin');
+      setIsAdminRoute(window.location.hash === '#rubenasmat');
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => {
