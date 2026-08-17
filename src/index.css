@@ -40,32 +40,81 @@ body {
 
 /* Print styles for package shipping label & receipts */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 6mm 8mm;
+  }
+
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   body * {
     visibility: hidden;
   }
-  
+
+  /* Reset all modal containers and parent wrappers so they do not clip or create scroll offsets */
+  .fixed, .relative, .overflow-y-auto, .overflow-x-auto, [class*="inset-0"], [class*="z-50"] {
+    position: static !important;
+    overflow: visible !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
   #shipping-label-print-area,
   #shipping-label-print-area *,
   #printable-receipt,
   #printable-receipt * {
-    visibility: visible;
+    visibility: visible !important;
   }
-  
+
   #shipping-label-print-area,
   #printable-receipt {
-    position: absolute;
-    left: 0;
-    top: 0;
+    position: relative !important;
+    display: block !important;
+    left: auto !important;
+    top: auto !important;
     width: 100% !important;
     max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
     box-shadow: none !important;
-    margin: 0 !important;
-    padding: 15px !important;
+    border: none !important;
     background: #fff !important;
     color: #000 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
-  
+
+  #printable-receipt > div {
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    border: 1px solid #61564A !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-shadow: none !important;
+  }
+
   #shipping-label-print-area {
     border: 2px solid #000 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
+

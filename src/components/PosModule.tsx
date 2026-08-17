@@ -411,7 +411,7 @@ export const PosModule: React.FC<PosModuleProps> = ({
 
       // Create Receipt Preview
       const isProvincia = deliveryType === 'provincia' || (selectedProvince || '').toLowerCase() !== 'lima';
-      const receiptNum = isProvincia ? `N° 0002-${Math.floor(100000 + Math.random() * 900000)}` : `N° 0001-${Math.floor(100000 + Math.random() * 900000)}`;
+      const receiptNum = isProvincia ? `0002-${Math.floor(100000 + Math.random() * 900000)}` : `0001-${Math.floor(100000 + Math.random() * 900000)}`;
       const trackCode = `OBS-${Math.floor(100000 + Math.random() * 900000)}`;
 
       const actualAdelanto = adelantoAmount > 0 ? adelantoAmount : (paymentMethod === 'Efectivo / Contraentrega' ? 0 : total);
@@ -1325,14 +1325,14 @@ export const PosModule: React.FC<PosModuleProps> = ({
               
               {/* VARIANT 1: NOTA DE VENTA LIMA (EXACT MATCH TO MOCKUP 1) */}
               {(receiptTab === 'lima' || receiptTab === 'todas') && (
-                <div className="max-w-2xl mx-auto border border-[#61564A] bg-white text-slate-900 overflow-hidden font-sans shadow-sm mb-4">
+                <div className="max-w-2xl mx-auto border border-[#61564A] bg-white text-slate-900 overflow-hidden font-sans shadow-sm mb-4 print:mb-0 print:border-black print:max-w-full">
                   
                   {/* Top Black Header */}
-                  <div className="bg-[#161716] text-[#E4DFD7] p-4 sm:p-5 flex justify-between items-center">
+                  <div className="bg-[#161716] text-[#E4DFD7] p-3.5 sm:p-4 print:p-3 flex justify-between items-center">
                     <div className="flex items-center space-x-3 sm:space-x-4">
-                      <img src="/assets/Icono/icono-blanco.jpeg" alt="Obsidiana Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-[#61564A]" />
+                      <img src="/assets/Icono/icono-blanco.jpeg" alt="Obsidiana Logo" className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border border-[#61564A]" />
                       <div>
-                        <h1 className="font-serif font-medium text-2xl sm:text-4xl tracking-widest uppercase leading-none">
+                        <h1 className="font-serif font-medium text-2xl sm:text-3xl tracking-widest uppercase leading-none">
                           OBSIDIANA
                         </h1>
                         <p className="text-[8px] sm:text-[10px] font-medium text-[#A59B8F] uppercase tracking-[0.25em] mt-1.5 ml-0.5">
@@ -1350,9 +1350,9 @@ export const PosModule: React.FC<PosModuleProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-4 sm:p-6 space-y-5">
+                  <div className="p-3.5 sm:p-5 print:p-3 space-y-3.5 print:space-y-2.5">
                     {/* DATOS DEL CLIENTE Box Grid */}
-                    <div className="grid grid-cols-12 gap-4 text-xs">
+                    <div className="grid grid-cols-12 gap-3 text-xs">
                       {/* Left Details (8 cols) */}
                       <div className="col-span-12 sm:col-span-8 flex flex-col">
                         <div className="bg-[#E4DFD7] px-3 py-1.5 font-bold text-[10px] text-[#161716] uppercase tracking-widest">
@@ -1433,8 +1433,8 @@ export const PosModule: React.FC<PosModuleProps> = ({
                             <td className="py-2 px-3 text-center font-medium border border-[#A59B8F]">S/ {item.total.toFixed(2)}</td>
                           </tr>
                         ))}
-                        {Array.from({ length: Math.max(0, 4 - generatedReceipt.items.length) }).map((_, i) => (
-                          <tr key={`blank-${i}`} className="h-7">
+                        {Array.from({ length: Math.max(0, 2 - generatedReceipt.items.length) }).map((_, i) => (
+                          <tr key={`blank-${i}`} className="h-5">
                             <td className="border border-[#A59B8F]"></td>
                             <td className="border border-[#A59B8F]"></td>
                             <td className="border border-[#A59B8F]"></td>
@@ -1490,9 +1490,9 @@ export const PosModule: React.FC<PosModuleProps> = ({
                     </div>
 
                     {/* Scissor Cut Tear-Off Voucher Stub */}
-                    <div className="pt-2 space-y-4">
+                    <div className="pt-1 space-y-2 print:pt-1 print:space-y-1.5">
                       <div className="flex items-center space-x-3 text-[#161716] text-[10px]">
-                        <Scissors className="w-5 h-5 shrink-0" />
+                        <Scissors className="w-4 h-4 shrink-0" />
                         <div className="border-b border-dashed border-[#161716] flex-1"></div>
                       </div>
 
@@ -1547,14 +1547,14 @@ export const PosModule: React.FC<PosModuleProps> = ({
 
               {/* VARIANT 2: NOTA DE VENTA PROVINCIA (EXACT MATCH TO MOCKUP 2) */}
               {(receiptTab === 'provincia') && (
-                <div className="max-w-2xl mx-auto border border-[#61564A] bg-white text-slate-900 overflow-hidden font-sans shadow-sm mb-4">
+                <div className="max-w-2xl mx-auto border border-[#61564A] bg-white text-slate-900 overflow-hidden font-sans shadow-sm mb-4 print:mb-0 print:border-black print:max-w-full">
                   
                   {/* Top Black Header */}
-                  <div className="bg-[#161716] text-[#E4DFD7] p-4 sm:p-5 flex justify-between items-center">
+                  <div className="bg-[#161716] text-[#E4DFD7] p-3.5 sm:p-4 print:p-3 flex justify-between items-center">
                     <div className="flex items-center space-x-3 sm:space-x-4">
-                      <img src="/assets/Icono/icono-blanco.jpeg" alt="Obsidiana Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-[#61564A]" />
+                      <img src="/assets/Icono/icono-blanco.jpeg" alt="Obsidiana Logo" className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border border-[#61564A]" />
                       <div>
-                        <h1 className="font-serif font-medium text-2xl sm:text-4xl tracking-widest uppercase leading-none">
+                        <h1 className="font-serif font-medium text-2xl sm:text-3xl tracking-widest uppercase leading-none">
                           OBSIDIANA
                         </h1>
                         <p className="text-[8px] sm:text-[10px] font-medium text-[#A59B8F] uppercase tracking-[0.25em] mt-1.5 ml-0.5">
@@ -1572,9 +1572,9 @@ export const PosModule: React.FC<PosModuleProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-4 sm:p-6 space-y-5">
+                  <div className="p-3.5 sm:p-5 print:p-3 space-y-3.5 print:space-y-2.5">
                     {/* DATOS DEL CLIENTE Box Grid */}
-                    <div className="grid grid-cols-12 gap-4 text-xs">
+                    <div className="grid grid-cols-12 gap-3 text-xs">
                       {/* Left Details (8 cols) */}
                       <div className="col-span-12 sm:col-span-8 flex flex-col">
                         <div className="bg-[#E4DFD7] px-3 py-1.5 font-bold text-[10px] text-[#161716] uppercase tracking-widest">
@@ -1660,8 +1660,8 @@ export const PosModule: React.FC<PosModuleProps> = ({
                             <td className="py-2 px-3 text-center font-medium border border-[#A59B8F]">S/ {item.total.toFixed(2)}</td>
                           </tr>
                         ))}
-                        {Array.from({ length: Math.max(0, 4 - generatedReceipt.items.length) }).map((_, i) => (
-                          <tr key={`blank-${i}`} className="h-7">
+                        {Array.from({ length: Math.max(0, 2 - generatedReceipt.items.length) }).map((_, i) => (
+                          <tr key={`blank-${i}`} className="h-5">
                             <td className="border border-[#A59B8F]"></td>
                             <td className="border border-[#A59B8F]"></td>
                             <td className="border border-[#A59B8F]"></td>
@@ -1717,9 +1717,9 @@ export const PosModule: React.FC<PosModuleProps> = ({
                     </div>
 
                     {/* Scissor Cut Tear-Off Voucher Stub */}
-                    <div className="pt-2 space-y-4">
+                    <div className="pt-1 space-y-2 print:pt-1 print:space-y-1.5">
                       <div className="flex items-center space-x-3 text-[#161716] text-[10px]">
-                        <Scissors className="w-5 h-5 shrink-0" />
+                        <Scissors className="w-4 h-4 shrink-0" />
                         <div className="border-b border-dashed border-[#161716] flex-1"></div>
                       </div>
 
