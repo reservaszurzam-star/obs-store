@@ -48,7 +48,7 @@ export default function App() {
   const [zones, setZones] = useState<Zone[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [stockMovements, setStockMovements] = useState<StockMovement[]>([]);
-  const [emailLogs, setEmailLogs] = useState<EmailLog[]>([...INITIAL_EMAIL_LOGS]);
+  const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
 
   // Modals state
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
@@ -162,8 +162,8 @@ export default function App() {
       setOrders(mappedOrders);
 
       // Stock local y logs
-      setStockMovements(INITIAL_STOCK_MOVEMENTS);
-      setEmailLogs(INITIAL_EMAIL_LOGS);
+      setStockMovements([]);
+      setEmailLogs([]);
 
     } catch (err) {
       console.error('Error cargando datos desde Supabase, usando datos locales:', err);
