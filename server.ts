@@ -342,15 +342,54 @@ async function startServer() {
         sentAt: new Date().toISOString(),
         status: "sent",
         bodyHtml: `
-          <div style="font-family: Arial, sans-serif; padding: 24px; color: #1e293b; background: #f8fafc; border-radius: 8px;">
-            <h2 style="color: #2563eb; margin-top: 0;">¡Hola ${orderData.customer.name}, hemos recibido tu pedido!</h2>
-            <p>Tu orden <strong>${orderData.orderNumber}</strong> ha sido registrada exitosamente. Puedes dar seguimiento en tiempo real con tu código de rastreo.</p>
-            <div style="background: #ffffff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px; margin: 16px 0;">
-              <p><strong>Código de Tracking:</strong> <span style="font-size: 18px; color: #2563eb; font-weight: bold;">${orderData.trackingCode}</span></p>
-              <p><strong>Dirección de Entrega:</strong> ${orderData.customer.address}</p>
-              <p><strong>Total Cancelado:</strong> S/ ${Number(orderData.total).toFixed(2)}</p>
+          <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FDFCFB; color: #181716; padding: 40px 20px; border: 1px solid #E4DFD7;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="font-size: 24px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; margin: 0;">Obsidiana</h1>
+              <p style="font-size: 10px; letter-spacing: 2px; color: #A59B8F; text-transform: uppercase; margin-top: 5px;">Plata & Joyería</p>
             </div>
-            <p>Atentamente,<br><strong>Equipo de Logística & Envíos</strong></p>
+            
+            <div style="border-top: 1px solid #E4DFD7; border-bottom: 1px solid #E4DFD7; padding: 20px 0; margin-bottom: 30px;">
+              <h2 style="font-size: 16px; font-weight: bold; text-align: center; margin-top: 0;">NOTA DE VENTA ELECTRÓNICA</h2>
+              <p style="font-size: 14px; text-align: center; color: #61564A; margin-bottom: 0;">Pedido #${orderData.orderNumber}</p>
+            </div>
+
+            <p style="font-size: 14px; margin-bottom: 8px;"><strong>Cliente:</strong> ${orderData.customer.name}</p>
+            <p style="font-size: 14px; margin-bottom: 8px;"><strong>Documento:</strong> ${orderData.customer.document || 'N/A'}</p>
+            <p style="font-size: 14px; margin-bottom: 8px;"><strong>Dirección de Entrega:</strong> ${orderData.customer.address}</p>
+            
+            <table style="width: 100%; margin-top: 40px; border-collapse: collapse; font-size: 14px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #181716; text-align: left;">
+                  <th style="padding: 10px 0; font-weight: bold;">Cant</th>
+                  <th style="padding: 10px 0; font-weight: bold;">Descripción</th>
+                  <th style="padding: 10px 0; text-align: right; font-weight: bold;">Importe</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${(orderData.items || []).map((item: any) => `
+                <tr style="border-bottom: 1px dashed #E4DFD7;">
+                  <td style="padding: 15px 0;">${item.quantity}</td>
+                  <td style="padding: 15px 0;">${item.productName}</td>
+                  <td style="padding: 15px 0; text-align: right;">S/ ${(Number(item.unitPrice) * Number(item.quantity)).toFixed(2)}</td>
+                </tr>
+                `).join('')}
+              </tbody>
+            </table>
+
+            <div style="margin-top: 20px; text-align: right; font-size: 14px; color: #61564A;">
+              <p style="margin: 5px 0;">Subtotal: S/ ${Number(orderData.subtotal).toFixed(2)}</p>
+              <p style="margin: 5px 0;">Envío: S/ ${Number(orderData.shippingFee).toFixed(2)}</p>
+              <p style="font-size: 18px; font-weight: bold; color: #181716; margin-top: 15px;">Total: S/ ${Number(orderData.total).toFixed(2)}</p>
+            </div>
+
+            <div style="background-color: #181716; color: #FDFCFB; padding: 24px; border-radius: 4px; text-align: center; margin-top: 50px;">
+              <p style="margin: 0; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #A59B8F;">Tu Código de Seguimiento</p>
+              <p style="margin: 10px 0 0 0; font-size: 22px; font-weight: bold; letter-spacing: 2px;">${orderData.trackingCode}</p>
+            </div>
+            
+            <p style="text-align: center; font-size: 12px; color: #A59B8F; margin-top: 40px; line-height: 1.6;">
+              Gracias por tu compra.<br>Si tienes alguna consulta sobre tu pedido, puedes responder directamente a este correo.
+            </p>
           </div>
         `,
       };
