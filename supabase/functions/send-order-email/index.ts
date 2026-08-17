@@ -1,18 +1,23 @@
-import { Resend } from 'resend';
+import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
-export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
 
   try {
-    const { orderData } = req.body;
-    if (!orderData || !orderData.customer) {
-      return res.status(400).json({ error: 'Faltan datos del pedido' });
-    }
+    const { orderData } = await req.json();
 
-    if (!orderData.customer.email) {
-      return res.status(400).json({ error: 'El cliente no tiene correo electrónico' });
+    if (!orderData || !orderData.customer?.email) {
+      return new Response(
+        JSON.stringify({ error: "Faltan datos del pedido o email del cliente" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const emailHtml = `
@@ -21,16 +26,16 @@ export default async function handler(req: any, res: any) {
           <h1 style="font-size: 24px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; margin: 0;">Obsidiana</h1>
           <p style="font-size: 10px; letter-spacing: 2px; color: #A59B8F; text-transform: uppercase; margin-top: 5px;">Plata &amp; Joyería</p>
         </div>
-        
+
         <div style="border-top: 1px solid #E4DFD7; border-bottom: 1px solid #E4DFD7; padding: 20px 0; margin-bottom: 30px;">
           <h2 style="font-size: 16px; font-weight: bold; text-align: center; margin-top: 0;">NOTA DE VENTA ELECTRÓNICA</h2>
           <p style="font-size: 14px; text-align: center; color: #61564A; margin-bottom: 0;">Pedido #${orderData.orderNumber}</p>
         </div>
 
         <p style="font-size: 14px; margin-bottom: 8px;"><strong>Cliente:</strong> ${orderData.customer.name}</p>
-        <p style="font-size: 14px; margin-bottom: 8px;"><strong>Documento:</strong> ${orderData.customer.document || 'N/A'}</p>
+        <p style="font-size: 14px; margin-bottom: 8px;"><strong>Documento:</strong> ${orderData.customer.document || "N/A"}</p>
         <p style="font-size: 14px; margin-bottom: 8px;"><strong>Dirección de Entrega:</strong> ${orderData.customer.address}</p>
-        
+
         <table style="width: 100%; margin-top: 40px; border-collapse: collapse; font-size: 14px;">
           <thead>
             <tr style="border-bottom: 1px solid #181716; text-align: left;">
@@ -41,12 +46,12 @@ export default async function handler(req: any, res: any) {
           </thead>
           <tbody>
             ${(orderData.items || []).map((item: any) => `
-            <tr style="border-bottom: 1px dashed #E4DFD7;">
-              <td style="padding: 15px 0;">${item.quantity}</td>
-              <td style="padding: 15px 0;">${item.productName}</td>
-              <td style="padding: 15px 0; text-align: right;">S/ ${(Number(item.unitPrice) * Number(item.quantity)).toFixed(2)}</td>
-            </tr>
-            `).join('')}
+              <tr style="border-bottom: 1px dashed #E4DFD7;">
+                <td style="padding: 15px 0;">${item.quantity}</td>
+                <td style="padding: 15px 0;">${item.productName}</td>
+                <td style="padding: 15px 0; text-align: right;">S/ ${(Number(item.unitPrice) * Number(item.quantity)).toFixed(2)}</td>
+              </tr>
+            `).join("")}
           </tbody>
         </table>
 
@@ -60,28 +65,47 @@ export default async function handler(req: any, res: any) {
           <p style="margin: 0; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #A59B8F;">Tu Código de Seguimiento</p>
           <p style="margin: 10px 0 0 0; font-size: 22px; font-weight: bold; letter-spacing: 2px;">${orderData.trackingCode}</p>
         </div>
-        
+
         <p style="text-align: center; font-size: 12px; color: #A59B8F; margin-top: 40px; line-height: 1.6;">
           Gracias por tu compra.<br>Si tienes alguna consulta sobre tu pedido, puedes responder directamente a este correo.
         </p>
       </div>
     `;
 
-    const { data, error } = await resend.emails.send({
-      from: 'Obsidiana <onboarding@resend.dev>',
-      to: [orderData.customer.email],
-      subject: `Nota de Venta - Pedido #${orderData.orderNumber} - Obsidiana`,
-      html: emailHtml,
+    // Enviar via Resend API (HTTP - funciona en Deno/Supabase Edge)
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Obsidiana <noreply@obsidianajoyeria.com>",
+        to: [orderData.customer.email],
+        subject: `Nota de Venta - Pedido #${orderData.orderNumber} - Obsidiana`,
+        html: emailHtml,
+      }),
     });
 
-    if (error) {
-      console.error('Resend error:', error);
-      return res.status(500).json({ error: error.message });
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Resend API error:", data);
+      return new Response(
+        JSON.stringify({ error: "Error al enviar correo", detail: data }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    return res.status(200).json({ success: true, message: 'Correo enviado correctamente', id: data?.id });
+    return new Response(
+      JSON.stringify({ success: true, id: data.id }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (error: any) {
-    console.error('Error enviando correo:', error);
-    return res.status(500).json({ error: error.message || 'Error interno al enviar correo' });
+    console.error("Error en Edge Function:", error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
-}
+});

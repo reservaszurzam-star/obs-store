@@ -261,12 +261,18 @@ export default function App() {
         }))
       });
 
-      // Enviar correo de confirmación
+      // Enviar correo de confirmación via Supabase Edge Function
       try {
-        await fetch('/api/emails/order-created', {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-order-email`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'apikey': supabaseAnonKey,
+          },
+          body: JSON.stringify({
             orderData: {
               ...orderData,
               id: result.id,
@@ -275,8 +281,12 @@ export default function App() {
             }
           }),
         });
+        if (!emailRes.ok) {
+          const errBody = await emailRes.json().catch(() => ({}));
+          console.error('Error enviando correo (Edge Function):', errBody);
+        }
       } catch (err) {
-        console.warn("Express endpoint for emails not available", err);
+        console.warn('Error de red al enviar correo:', err);
       }
 
       showToast(`¡Pedido creado exitosamente!`);
