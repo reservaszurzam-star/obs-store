@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -45,7 +45,7 @@ serve(async (req) => {
             </tr>
           </thead>
           <tbody>
-            ${(orderData.items || []).map((item: any) => `
+            ${(orderData.items || []).map((item: { quantity: number; productName: string; unitPrice: number }) => `
               <tr style="border-bottom: 1px dashed #E4DFD7;">
                 <td style="padding: 15px 0;">${item.quantity}</td>
                 <td style="padding: 15px 0;">${item.productName}</td>
@@ -67,44 +67,41 @@ serve(async (req) => {
         </div>
 
         <p style="text-align: center; font-size: 12px; color: #A59B8F; margin-top: 40px; line-height: 1.6;">
-          Gracias por tu compra.<br>Si tienes alguna consulta sobre tu pedido, puedes responder directamente a este correo.
+          Gracias por tu compra.<br>Si tienes alguna consulta, puedes responder directamente a este correo.
         </p>
       </div>
     `;
 
-    // Enviar via Resend API (HTTP - funciona en Deno/Supabase Edge)
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
-        "Content-Type": "application/json",
+    const client = new SMTPClient({
+      connection: {
+        hostname: "smtp.gmail.com",
+        port: 465,
+        tls: true,
+        auth: {
+          username: Deno.env.get("SMTP_USER")!,
+          password: Deno.env.get("SMTP_PASS")!,
+        },
       },
-      body: JSON.stringify({
-        from: "Obsidiana <noreply@obsidianajoyeria.com>",
-        to: [orderData.customer.email],
-        subject: `Nota de Venta - Pedido #${orderData.orderNumber} - Obsidiana`,
-        html: emailHtml,
-      }),
     });
 
-    const data = await response.json();
+    await client.send({
+      from: `Obsidiana <${Deno.env.get("SMTP_USER")}>`,
+      to: orderData.customer.email,
+      subject: `Nota de Venta - Pedido #${orderData.orderNumber} - Obsidiana`,
+      html: emailHtml,
+    });
 
-    if (!response.ok) {
-      console.error("Resend API error:", data);
-      return new Response(
-        JSON.stringify({ error: "Error al enviar correo", detail: data }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    await client.close();
 
     return new Response(
-      JSON.stringify({ success: true, id: data.id }),
+      JSON.stringify({ success: true, message: "Correo enviado correctamente" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: any) {
-    console.error("Error en Edge Function:", error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Error en Edge Function:", message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
