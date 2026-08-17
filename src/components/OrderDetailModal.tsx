@@ -12,10 +12,15 @@ import {
   Package, 
   Send,
   AlertCircle,
-  Tag
+  Tag,
+  Edit2,
+  Trash2,
+  Ban,
+  AlertTriangle
 } from 'lucide-react';
-import { Order, OrderStatus } from '../types';
+import { Order, OrderStatus, Province, Zone } from '../types';
 import { PackageShippingLabelModal } from './PackageShippingLabelModal';
+import { EditOrderModal } from './EditOrderModal';
 import { printElement } from '../lib/printHelper';
 
 interface OrderDetailModalProps {
@@ -23,6 +28,11 @@ interface OrderDetailModalProps {
   onClose: () => void;
   onUpdateStatus: (orderId: string, status: OrderStatus, note?: string) => Promise<void>;
   onSendTestEmail: (recipientEmail: string, subject: string, bodyHtml: string) => Promise<void>;
+  onDeleteOrder?: (orderId: string) => Promise<void>;
+  onEditOrder?: (orderId: string, updatedData: Partial<Order>) => Promise<void>;
+  onAnularOrder?: (orderId: string, reason?: string) => Promise<void>;
+  provinces?: Province[];
+  zones?: Zone[];
 }
 
 export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
@@ -30,12 +40,22 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   onClose,
   onUpdateStatus,
   onSendTestEmail,
+  onDeleteOrder,
+  onEditOrder,
+  onAnularOrder,
+  provinces = [],
+  zones = [],
 }) => {
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>('pendiente');
   const [statusNote, setStatusNote] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [emailStatusMsg, setEmailStatusMsg] = useState('');
   const [isShippingLabelOpen, setIsShippingLabelOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isAnularConfirmOpen, setIsAnularConfirmOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [anularReason, setAnularReason] = useState('');
+  const [isProcessingAction, setIsProcessingAction] = useState(false);
 
   React.useEffect(() => {
     if (order) {
@@ -47,6 +67,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
   if (!order) return null;
 
+  const isCancelado = order.status === 'cancelado';
 
   const handleStatusChange = async () => {
     setIsUpdating(true);
@@ -66,14 +87,43 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     printElement('order-detail-printable-receipt', `Nota de Venta #${order.orderNumber}`);
   };
 
+  const handleConfirmAnular = async () => {
+    if (!onAnularOrder) return;
+    setIsProcessingAction(true);
+    try {
+      await onAnularOrder(order.id, anularReason);
+      setIsAnularConfirmOpen(false);
+      setAnularReason('');
+      onClose();
+    } catch (e: any) {
+      setEmailStatusMsg(`Error al anular: ${e.message}`);
+    } finally {
+      setIsProcessingAction(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!onDeleteOrder) return;
+    setIsProcessingAction(true);
+    try {
+      await onDeleteOrder(order.id);
+      setIsDeleteConfirmOpen(false);
+      onClose();
+    } catch (e: any) {
+      setEmailStatusMsg(`Error al eliminar: ${e.message}`);
+    } finally {
+      setIsProcessingAction(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white border border-zinc-200 rounded-sm w-full max-w-4xl max-h-[90vh] flex flex-col shadow-xl text-zinc-800 overflow-hidden">
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white">
+        <div className="flex flex-wrap items-center justify-between px-6 py-4 border-b border-zinc-100 bg-white gap-2">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-sm bg-zinc-100 text-zinc-900 flex items-center justify-center border border-zinc-200 font-bold">
+            <div className="w-10 h-10 rounded-sm bg-zinc-100 flex items-center justify-center font-bold text-zinc-900 border border-zinc-200">
               PED
             </div>
             <div>
@@ -89,17 +139,59 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center flex-wrap gap-1.5">
+            {/* Descargar Nota de Venta */}
             <button
               onClick={handlePrintReceipt}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-zinc-50 text-zinc-700 rounded-sm text-xs font-medium border border-zinc-200 transition-colors"
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-zinc-50 text-zinc-700 rounded-sm text-xs font-medium border border-zinc-200 transition-colors cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Descargar Nota de Venta</span>
             </button>
+
+            {/* Editar Pedido */}
+            {onEditOrder && (
+              <button
+                onClick={() => setIsEditing(true)}
+                title="Editar datos del pedido"
+                className="flex items-center space-x-1 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-sm text-xs font-semibold border border-zinc-300 transition-colors cursor-pointer"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+                <span>Editar</span>
+              </button>
+            )}
+
+            {/* Anular Pedido */}
+            {onAnularOrder && (
+              <button
+                onClick={() => setIsAnularConfirmOpen(true)}
+                disabled={isCancelado}
+                title={isCancelado ? 'Pedido ya anulado' : 'Anular Pedido'}
+                className={`flex items-center space-x-1 px-3 py-1.5 rounded-sm text-xs font-semibold border transition-colors cursor-pointer ${
+                  isCancelado
+                    ? 'bg-zinc-100 text-zinc-300 border-zinc-200 cursor-not-allowed'
+                    : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300'
+                }`}
+              >
+                <Ban className="w-3.5 h-3.5" />
+                <span>Anular</span>
+              </button>
+            )}
+
+            {/* Eliminar Pedido */}
+            {onDeleteOrder && (
+              <button
+                onClick={() => setIsDeleteConfirmOpen(true)}
+                title="Eliminar Pedido definitivamente"
+                className="flex items-center space-x-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-sm text-xs font-semibold border border-rose-200 hover:border-rose-600 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+
             <button
               onClick={onClose}
-              className="text-zinc-400 hover:text-zinc-600 p-2 rounded-sm hover:bg-zinc-100 transition-colors"
+              className="text-zinc-400 hover:text-zinc-600 p-1.5 rounded-sm hover:bg-zinc-100 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -468,6 +560,114 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Edit Order Modal */}
+      {isEditing && onEditOrder && (
+        <EditOrderModal
+          isOpen={isEditing}
+          onClose={() => setIsEditing(false)}
+          order={order}
+          provinces={provinces}
+          zones={zones}
+          onSave={async (orderId, data) => {
+            await onEditOrder(orderId, data);
+            setIsEditing(false);
+          }}
+        />
+      )}
+
+      {/* Modal Confirmación Anular */}
+      {isAnularConfirmOpen && onAnularOrder && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-amber-200 rounded-xl w-full max-w-md p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <Ban className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-zinc-900">¿Anular Pedido {order.orderNumber}?</h3>
+                <p className="text-xs text-zinc-500">El estado del pedido cambiará a "Cancelado".</p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-zinc-700 mb-1">Motivo de Anulación (opcional)</label>
+              <textarea
+                rows={2}
+                value={anularReason}
+                onChange={(e) => setAnularReason(e.target.value)}
+                placeholder="Ej. Cliente desistió de la compra / Error en duplicado..."
+                className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAnularConfirmOpen(false);
+                  setAnularReason('');
+                }}
+                disabled={isProcessingAction}
+                className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmAnular}
+                disabled={isProcessingAction}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center space-x-1 shadow-sm disabled:opacity-50"
+              >
+                <Ban className="w-4 h-4" />
+                <span>{isProcessingAction ? 'Anulando...' : 'Confirmar Anulación'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Confirmación Eliminar */}
+      {isDeleteConfirmOpen && onDeleteOrder && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-rose-200 rounded-xl w-full max-w-md p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-zinc-900">¿Eliminar Pedido Definitivamente?</h3>
+                <p className="text-xs text-zinc-500 font-mono font-bold text-rose-600">{order.orderNumber} - {order.customer.name}</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-zinc-600 bg-rose-50 p-3 rounded-lg border border-rose-100">
+              ⚠️ Esta acción <strong>eliminará permanentemente</strong> el registro del pedido, sus ítems y movimientos vinculados. Esta operación no se puede deshacer.
+            </p>
+
+            <div className="flex justify-end space-x-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                disabled={isProcessingAction}
+                className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isProcessingAction}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center space-x-1 shadow-sm disabled:opacity-50"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>{isProcessingAction ? 'Eliminando...' : 'Sí, Eliminar'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -240,6 +240,52 @@ export const pedidosService = {
     if (error) throw error;
   },
 
+  async update(id: string, updates: Record<string, any>): Promise<void> {
+    const { error } = await supabase
+      .from('pedidos')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  async anular(id: string, reason?: string): Promise<void> {
+    const { error } = await supabase
+      .from('pedidos')
+      .update({ 
+        estado: 'cancelado',
+        cliente_notas: reason ? `ANULADO: ${reason}` : undefined,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  async delete(id: string): Promise<void> {
+    // 1. Eliminar movimientos de caja vinculados si existen
+    try {
+      await supabase.from('caja_movimientos').delete().eq('pedido_id', id);
+    } catch {
+      // no-op
+    }
+
+    // 2. Eliminar items del pedido
+    try {
+      await supabase.from('pedido_items').delete().eq('pedido_id', id);
+    } catch {
+      // no-op
+    }
+
+    // 3. Eliminar el pedido
+    const { error } = await supabase
+      .from('pedidos')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+
   async getByNumero(numero: string): Promise<any> {
     const { data, error } = await supabase
       .from('pedidos')

@@ -468,6 +468,114 @@ export default function App() {
     }
   };
 
+  // 2.1 Delete Order
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      await pedidosService.delete(orderId);
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder(null);
+      }
+      showToast('Pedido eliminado definitivamente con éxito.');
+    } catch (err: any) {
+      showToast(err.message || 'Error al eliminar pedido', 'error');
+    }
+  };
+
+  // 2.2 Edit Order
+  const handleEditOrder = async (orderId: string, updatedData: Partial<Order>) => {
+    try {
+      const updates: Record<string, any> = {};
+      if (updatedData.customer) {
+        updates.cliente_nombre = updatedData.customer.name;
+        updates.cliente_telefono = updatedData.customer.phone;
+        updates.cliente_email = updatedData.customer.email;
+        updates.cliente_direccion = updatedData.customer.address;
+        updates.cliente_distrito = updatedData.customer.district;
+        updates.cliente_provincia = updatedData.customer.province;
+        updates.cliente_zona = updatedData.customer.zone;
+        updates.cliente_notas = updatedData.customer.notes;
+      }
+      if (updatedData.shippingFee !== undefined) updates.tarifa_envio = updatedData.shippingFee;
+      if (updatedData.adelanto !== undefined) updates.adelanto = updatedData.adelanto;
+      if (updatedData.total !== undefined) updates.total = updatedData.total;
+      if (updatedData.paymentMethod !== undefined) updates.metodo_pago = updatedData.paymentMethod;
+      if (updatedData.status !== undefined) updates.estado = updatedData.status;
+
+      await pedidosService.update(orderId, updates);
+
+      setOrders((prev) =>
+        prev.map((o) => {
+          if (o.id === orderId) {
+            return {
+              ...o,
+              ...updatedData,
+              customer: updatedData.customer ? { ...o.customer, ...updatedData.customer } : o.customer,
+            };
+          }
+          return o;
+        })
+      );
+
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder((prev) =>
+          prev
+            ? {
+                ...prev,
+                ...updatedData,
+                customer: updatedData.customer ? { ...prev.customer, ...updatedData.customer } : prev.customer,
+              }
+            : null
+        );
+      }
+
+      showToast('Pedido actualizado correctamente.');
+    } catch (err: any) {
+      showToast(err.message || 'Error al actualizar pedido', 'error');
+      throw err;
+    }
+  };
+
+  // 2.3 Anular Order
+  const handleAnularOrder = async (orderId: string, reason?: string) => {
+    try {
+      await pedidosService.anular(orderId, reason);
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? {
+                ...o,
+                status: 'cancelado' as OrderStatus,
+                customer: {
+                  ...o.customer,
+                  notes: reason ? `ANULADO: ${reason}` : o.customer.notes,
+                },
+              }
+            : o
+        )
+      );
+
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder((prev) =>
+          prev
+            ? {
+                ...prev,
+                status: 'cancelado' as OrderStatus,
+                customer: {
+                  ...prev.customer,
+                  notes: reason ? `ANULADO: ${reason}` : prev.customer.notes,
+                },
+              }
+            : null
+        );
+      }
+
+      showToast('Pedido anulado correctamente (Estado: Cancelado).');
+    } catch (err: any) {
+      showToast(err.message || 'Error al anular pedido', 'error');
+    }
+  };
+
   // 3. Add Product
   const handleAddProduct = async (productData: any) => {
     try {
@@ -741,6 +849,11 @@ export default function App() {
               onTrackOrder={handleTrackCodeRedirect}
               onOpenNewOrder={() => setIsNewOrderOpen(true)}
               onAutoProcess={handleAutoProcessOrders}
+              onDeleteOrder={handleDeleteOrder}
+              onEditOrder={handleEditOrder}
+              onAnularOrder={handleAnularOrder}
+              provinces={provinces}
+              zones={zones}
             />
           )}
 
@@ -814,6 +927,11 @@ export default function App() {
         onClose={() => setSelectedOrder(null)}
         onUpdateStatus={handleUpdateOrderStatus}
         onSendTestEmail={handleSendTestEmail}
+        onDeleteOrder={handleDeleteOrder}
+        onEditOrder={handleEditOrder}
+        onAnularOrder={handleAnularOrder}
+        provinces={provinces}
+        zones={zones}
       />
 
       <AddProductModal
