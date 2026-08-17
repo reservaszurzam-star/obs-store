@@ -213,7 +213,7 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
                 
                 {/* Cuadro de Imagen Elegante */}
                 <div className="aspect-[4/5] bg-[#E4DFD7]/20 relative flex items-center justify-center p-8 mb-6 overflow-hidden">
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.03] transition-colors duration-500 z-10" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.03] transition-colors duration-500 z-10 pointer-events-none" />
                   
                   <ProductImage product={product} />
                   
