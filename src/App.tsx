@@ -38,53 +38,127 @@ import { supabase } from './lib/supabase';
 import { productosService, pedidosService, configService, clientesService } from './lib/services';
 import { zonasService } from './lib/zonasService';
 
-// ─── Helper: genera el HTML de la Nota de Venta ──────────────────────────────
+// ─── Helper: genera el HTML de la Nota de Venta (diseño premium) ─────────────
 function buildOrderEmailHtml(orderData: any): string {
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' });
+
   const items = (orderData.items || []).map((item: any) => `
-    <tr style="border-bottom: 1px dashed #E4DFD7;">
-      <td style="padding: 12px 0;">${item.quantity}</td>
-      <td style="padding: 12px 0;">${item.productName}</td>
-      <td style="padding: 12px 0; text-align: right;">S/ ${(Number(item.unitPrice) * Number(item.quantity)).toFixed(2)}</td>
+    <tr>
+      <td style="padding:14px 12px;border-bottom:1px solid #f0ede9;font-size:14px;color:#181716;">${item.quantity}x</td>
+      <td style="padding:14px 12px;border-bottom:1px solid #f0ede9;font-size:14px;color:#181716;">${item.productName}</td>
+      <td style="padding:14px 12px;border-bottom:1px solid #f0ede9;font-size:14px;color:#181716;text-align:right;white-space:nowrap;">S/ ${(Number(item.unitPrice) * Number(item.quantity)).toFixed(2)}</td>
     </tr>
   `).join('');
 
-  return `
-    <div style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:600px;margin:0 auto;background-color:#FDFCFB;color:#181716;padding:40px 20px;border:1px solid #E4DFD7;">
-      <div style="text-align:center;margin-bottom:30px;">
-        <h1 style="font-size:24px;font-weight:300;letter-spacing:4px;text-transform:uppercase;margin:0;">Obsidiana</h1>
-        <p style="font-size:10px;letter-spacing:2px;color:#A59B8F;text-transform:uppercase;margin-top:5px;">Plata &amp; Joyería</p>
-      </div>
-      <div style="border-top:1px solid #E4DFD7;border-bottom:1px solid #E4DFD7;padding:20px 0;margin-bottom:30px;">
-        <h2 style="font-size:16px;font-weight:bold;text-align:center;margin-top:0;">NOTA DE VENTA ELECTRÓNICA</h2>
-        <p style="font-size:14px;text-align:center;color:#61564A;margin-bottom:0;">Pedido #${orderData.orderNumber}</p>
-      </div>
-      <p style="font-size:14px;margin-bottom:8px;"><strong>Cliente:</strong> ${orderData.customer?.name || ''}</p>
-      <p style="font-size:14px;margin-bottom:8px;"><strong>Documento:</strong> ${orderData.customer?.document || 'N/A'}</p>
-      <p style="font-size:14px;margin-bottom:8px;"><strong>Dirección:</strong> ${orderData.customer?.address || ''}</p>
-      <table style="width:100%;margin-top:30px;border-collapse:collapse;font-size:14px;">
-        <thead>
-          <tr style="border-bottom:1px solid #181716;text-align:left;">
-            <th style="padding:10px 0;">Cant</th>
-            <th style="padding:10px 0;">Descripción</th>
-            <th style="padding:10px 0;text-align:right;">Importe</th>
+  return `<!DOCTYPE html>
+  <html lang="es">
+  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"></head>
+  <body style="margin:0;padding:0;background:#f4f1ee;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ee;padding:40px 0;">
+      <tr><td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background:#181716;padding:36px 40px;text-align:center;">
+              <p style="margin:0;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#A59B8F;">Obsidiana</p>
+              <p style="margin:6px 0 0;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#5a5248;">Plata &amp; Joyería</p>
+            </td>
           </tr>
-        </thead>
-        <tbody>${items}</tbody>
-      </table>
-      <div style="margin-top:20px;text-align:right;font-size:14px;color:#61564A;">
-        <p style="margin:4px 0;">Subtotal: S/ ${Number(orderData.subtotal).toFixed(2)}</p>
-        <p style="margin:4px 0;">Envío: S/ ${Number(orderData.shippingFee).toFixed(2)}</p>
-        <p style="font-size:18px;font-weight:bold;color:#181716;margin-top:12px;">Total: S/ ${Number(orderData.total).toFixed(2)}</p>
-      </div>
-      <div style="background-color:#181716;color:#FDFCFB;padding:24px;border-radius:4px;text-align:center;margin-top:40px;">
-        <p style="margin:0;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#A59B8F;">Código de Seguimiento</p>
-        <p style="margin:10px 0 0 0;font-size:22px;font-weight:bold;letter-spacing:2px;">${orderData.trackingCode}</p>
-      </div>
-      <p style="text-align:center;font-size:12px;color:#A59B8F;margin-top:36px;line-height:1.6;">
-        Gracias por tu compra.<br>Si tienes consultas, responde directamente a este correo.
-      </p>
-    </div>
-  `;
+
+          <!-- TÍTULO -->
+          <tr>
+            <td style="background:#ffffff;padding:32px 40px 24px;border-left:1px solid #e8e3de;border-right:1px solid #e8e3de;">
+              <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#A59B8F;">NOTA DE VENTA</p>
+              <h1 style="margin:8px 0 4px;font-size:28px;font-weight:300;color:#181716;letter-spacing:-0.5px;">¡Gracias por tu compra!</h1>
+              <p style="margin:0;font-size:13px;color:#A59B8F;">${fecha} · Pedido <strong style="color:#61564A;">#${orderData.orderNumber}</strong></p>
+            </td>
+          </tr>
+
+          <!-- INFO CLIENTE -->
+          <tr>
+            <td style="background:#faf8f6;padding:20px 40px;border-left:1px solid #e8e3de;border-right:1px solid #e8e3de;border-top:1px solid #ede9e4;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="width:50%;padding-right:12px;">
+                    <p style="margin:0 0 2px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#A59B8F;">Cliente</p>
+                    <p style="margin:0;font-size:14px;color:#181716;font-weight:600;">${orderData.customer?.name || ''}</p>
+                    <p style="margin:2px 0 0;font-size:12px;color:#A59B8F;">${orderData.customer?.email || ''}</p>
+                  </td>
+                  <td style="width:50%;padding-left:12px;">
+                    <p style="margin:0 0 2px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#A59B8F;">Envío a</p>
+                    <p style="margin:0;font-size:14px;color:#181716;">${orderData.customer?.address || ''}</p>
+                    <p style="margin:2px 0 0;font-size:12px;color:#A59B8F;">${orderData.customer?.district || ''}, ${orderData.customer?.province || ''}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- PRODUCTOS -->
+          <tr>
+            <td style="background:#ffffff;padding:0 40px;border-left:1px solid #e8e3de;border-right:1px solid #e8e3de;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <thead>
+                  <tr style="border-bottom:2px solid #181716;">
+                    <th style="padding:16px 12px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#A59B8F;text-align:left;">Cant</th>
+                    <th style="padding:16px 12px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#A59B8F;text-align:left;">Producto</th>
+                    <th style="padding:16px 12px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#A59B8F;text-align:right;">Importe</th>
+                  </tr>
+                </thead>
+                <tbody>${items}</tbody>
+              </table>
+            </td>
+          </tr>
+
+          <!-- TOTALES -->
+          <tr>
+            <td style="background:#ffffff;padding:0 40px 28px;border-left:1px solid #e8e3de;border-right:1px solid #e8e3de;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="border-top:1px solid #ede9e4;padding:12px 12px 4px;text-align:right;">
+                    <span style="font-size:12px;color:#A59B8F;">Subtotal</span>
+                    <span style="font-size:12px;color:#61564A;margin-left:32px;">S/ ${Number(orderData.subtotal).toFixed(2)}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 12px;text-align:right;">
+                    <span style="font-size:12px;color:#A59B8F;">Costo de envío</span>
+                    <span style="font-size:12px;color:#61564A;margin-left:32px;">S/ ${Number(orderData.shippingFee).toFixed(2)}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 12px 0;border-top:2px solid #181716;text-align:right;margin-top:8px;">
+                    <span style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#181716;">Total</span>
+                    <span style="font-size:20px;font-weight:700;color:#181716;margin-left:32px;">S/ ${Number(orderData.total).toFixed(2)}</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- TRACKING -->
+          <tr>
+            <td style="background:#181716;padding:28px 40px;text-align:center;">
+              <p style="margin:0 0 10px;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#5a5248;">Tu código de seguimiento</p>
+              <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:4px;color:#ffffff;">${orderData.trackingCode}</p>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="background:#faf8f6;padding:24px 40px;text-align:center;border:1px solid #e8e3de;border-top:none;">
+              <p style="margin:0;font-size:12px;color:#A59B8F;line-height:1.7;">¿Tienes alguna pregunta sobre tu pedido? Responde directamente a este correo.<br>
+              <strong style="color:#61564A;">reservaszurzam@gmail.com</strong></p>
+            </td>
+          </tr>
+
+        </table>
+      </td></tr>
+    </table>
+  </body>
+  </html>`;
 }
 
 export default function App() {
@@ -312,37 +386,30 @@ export default function App() {
 
       // Enviar Nota de Venta via Supabase Edge Function (send-email)
       // Solo se envía si el admin está autenticado (tiene JWT válido con perfil activo)
+      // Enviar correo en segundo plano (fire-and-forget) — no bloquea la UI
       if (session?.access_token && orderData.customer?.email) {
-        try {
-          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-          const emailHtml = buildOrderEmailHtml({
-            ...orderData,
-            id: result.id,
-            orderNumber: result.numero_pedido,
-            trackingCode: result.codigo_tracking,
-          });
-          const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session.access_token}`,
-              'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-            },
-            body: JSON.stringify({
-              to: orderData.customer.email,
-              subject: `Nota de Venta - Pedido #${result.numero_pedido} - Obsidiana`,
-              html: emailHtml,
-            }),
-          });
-          if (!emailRes.ok) {
-            const errBody = await emailRes.json().catch(() => ({}));
-            console.error('[send-email] Error:', errBody);
-          } else {
-            console.log('[send-email] Correo enviado correctamente a', orderData.customer.email);
-          }
-        } catch (err) {
-          console.warn('[send-email] Error de red:', err);
-        }
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const emailHtml = buildOrderEmailHtml({
+          ...orderData,
+          id: result.id,
+          orderNumber: result.numero_pedido,
+          trackingCode: result.codigo_tracking,
+        });
+        fetch(`${supabaseUrl}/functions/v1/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            to: orderData.customer.email,
+            subject: `Nota de Venta - Pedido #${result.numero_pedido} - Obsidiana`,
+            html: emailHtml,
+          }),
+        })
+        .then(r => r.ok ? console.log('[send-email] OK →', orderData.customer.email) : r.json().then(e => console.error('[send-email] Error:', e)))
+        .catch(e => console.warn('[send-email] Red:', e));
       }
 
       showToast(`¡Pedido creado exitosamente!`);
