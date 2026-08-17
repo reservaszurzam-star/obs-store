@@ -251,7 +251,110 @@ export const pedidosService = {
     if (error) throw error;
   },
 
-  async anular(id: string, reason?: string): Promise<void> {
+  async restaurarStockItems(
+    items: { producto_id?: string; producto_nombre?: string; sku?: string; cantidad: number }[],
+    motivo = 'Devolución de stock por anulación/eliminación de pedido'
+  ): Promise<void> {
+    if (!items || items.length === 0) return;
+
+    for (const item of items) {
+      const cantidad = Number(item.cantidad) || 0;
+      if (cantidad <= 0) continue;
+
+      let productId = item.producto_id;
+
+      // Si no tenemos producto_id, buscar por SKU o nombre
+      if (!productId) {
+        if (item.sku) {
+          const { data } = await supabase.from('productos').select('id, stock, nombre').eq('sku', item.sku).maybeSingle();
+          if (data) productId = data.id;
+        }
+        if (!productId && item.producto_nombre) {
+          const { data } = await supabase.from('productos').select('id, stock, nombre').ilike('nombre', item.producto_nombre).maybeSingle();
+          if (data) productId = data.id;
+        }
+      }
+
+      if (productId) {
+        try {
+          const { data: prod } = await supabase.from('productos').select('id, stock, nombre').eq('id', productId).single();
+          if (prod) {
+            const stockAnterior = prod.stock || 0;
+            const stockNuevo = stockAnterior + cantidad;
+
+            // 1. Actualizar stock en productos
+            await supabase.from('productos').update({ stock: stockNuevo }).eq('id', productId);
+
+            // 2. Registrar en kardex stock_movimientos
+            try {
+              await supabase.from('stock_movimientos').insert({
+                producto_id: productId,
+                producto_nombre: prod.nombre || item.producto_nombre || 'Producto',
+                tipo: 'in',
+                cantidad: cantidad,
+                stock_anterior: stockAnterior,
+                stock_nuevo: stockNuevo,
+                motivo: motivo,
+              });
+            } catch {
+              // no-op
+            }
+          }
+        } catch (e) {
+          console.error('Error restaurando stock para producto:', productId, e);
+        }
+      }
+    }
+  },
+
+  async descontarStockItems(
+    items: { producto_id?: string; producto_nombre?: string; sku?: string; cantidad: number }[],
+    motivo = 'Deducción de stock por reactivación de pedido'
+  ): Promise<void> {
+    if (!items || items.length === 0) return;
+
+    for (const item of items) {
+      const cantidad = Number(item.cantidad) || 0;
+      if (cantidad <= 0) continue;
+
+      let productId = item.producto_id;
+      if (!productId && item.sku) {
+        const { data } = await supabase.from('productos').select('id').eq('sku', item.sku).maybeSingle();
+        if (data) productId = data.id;
+      }
+
+      if (productId) {
+        try {
+          const { data: prod } = await supabase.from('productos').select('id, stock, nombre').eq('id', productId).single();
+          if (prod) {
+            const stockAnterior = prod.stock || 0;
+            const stockNuevo = Math.max(0, stockAnterior - cantidad);
+
+            await supabase.from('productos').update({ stock: stockNuevo }).eq('id', productId);
+
+            try {
+              await supabase.from('stock_movimientos').insert({
+                producto_id: productId,
+                producto_nombre: prod.nombre || item.producto_nombre || 'Producto',
+                tipo: 'out',
+                cantidad: cantidad,
+                stock_anterior: stockAnterior,
+                stock_nuevo: stockNuevo,
+                motivo: motivo,
+              });
+            } catch {
+              // no-op
+            }
+          }
+        } catch (e) {
+          console.error('Error descontando stock para producto:', productId, e);
+        }
+      }
+    }
+  },
+
+  async anular(id: string, reason?: string, items?: any[]): Promise<void> {
+    // 1. Marcar como cancelado
     const { error } = await supabase
       .from('pedidos')
       .update({ 
@@ -261,24 +364,72 @@ export const pedidosService = {
       })
       .eq('id', id);
     if (error) throw error;
+
+    // 2. Restaurar stock si se pasaron items o consultarlos
+    let itemsToRestore = items;
+    if (!itemsToRestore || itemsToRestore.length === 0) {
+      try {
+        const { data } = await supabase.from('pedido_items').select('*').eq('pedido_id', id);
+        itemsToRestore = data || [];
+      } catch {
+        itemsToRestore = [];
+      }
+    }
+
+    if (itemsToRestore && itemsToRestore.length > 0) {
+      await this.restaurarStockItems(
+        itemsToRestore.map(i => ({
+          producto_id: i.producto_id || i.productId,
+          producto_nombre: i.producto_nombre || i.productName,
+          sku: i.sku,
+          cantidad: i.cantidad || i.quantity || 1
+        })),
+        `Devolución por anulación de pedido ${id}`
+      );
+    }
   },
 
-  async delete(id: string): Promise<void> {
-    // 1. Eliminar movimientos de caja vinculados si existen
+  async delete(id: string, shouldRestoreStock = true, items?: any[]): Promise<void> {
+    // 1. Restaurar stock si aplica antes de borrar los ítems
+    if (shouldRestoreStock) {
+      let itemsToRestore = items;
+      if (!itemsToRestore || itemsToRestore.length === 0) {
+        try {
+          const { data } = await supabase.from('pedido_items').select('*').eq('pedido_id', id);
+          itemsToRestore = data || [];
+        } catch {
+          itemsToRestore = [];
+        }
+      }
+
+      if (itemsToRestore && itemsToRestore.length > 0) {
+        await this.restaurarStockItems(
+          itemsToRestore.map(i => ({
+            producto_id: i.producto_id || i.productId,
+            producto_nombre: i.producto_nombre || i.productName,
+            sku: i.sku,
+            cantidad: i.cantidad || i.quantity || 1
+          })),
+          `Devolución por eliminación de pedido ${id}`
+        );
+      }
+    }
+
+    // 2. Eliminar movimientos de caja vinculados si existen
     try {
       await supabase.from('caja_movimientos').delete().eq('pedido_id', id);
     } catch {
       // no-op
     }
 
-    // 2. Eliminar items del pedido
+    // 3. Eliminar items del pedido
     try {
       await supabase.from('pedido_items').delete().eq('pedido_id', id);
     } catch {
       // no-op
     }
 
-    // 3. Eliminar el pedido
+    // 4. Eliminar el pedido
     const { error } = await supabase
       .from('pedidos')
       .delete()

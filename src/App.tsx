@@ -468,23 +468,58 @@ export default function App() {
     }
   };
 
-  // 2.1 Delete Order
+  // 2.1 Delete Order (con devolución automática de stock si no estaba anulado)
   const handleDeleteOrder = async (orderId: string) => {
     try {
-      await pedidosService.delete(orderId);
+      const targetOrder = orders.find((o) => o.id === orderId);
+      const shouldRestore = targetOrder ? targetOrder.status !== 'cancelado' : true;
+      const itemsToRestore = targetOrder ? targetOrder.items.map(i => ({
+        producto_id: i.productId,
+        producto_nombre: i.productName,
+        sku: i.sku,
+        cantidad: i.quantity
+      })) : undefined;
+
+      await pedidosService.delete(orderId, shouldRestore, itemsToRestore);
       setOrders((prev) => prev.filter((o) => o.id !== orderId));
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder(null);
       }
-      showToast('Pedido eliminado definitivamente con éxito.');
+      
+      // Recargar catálogo y stock actualizado
+      await loadInitialData();
+      showToast('Pedido eliminado y stock devuelto exitosamente al inventario.');
     } catch (err: any) {
       showToast(err.message || 'Error al eliminar pedido', 'error');
     }
   };
 
-  // 2.2 Edit Order
+  // 2.2 Edit Order (con ajuste de stock si cambia estado a/de cancelado)
   const handleEditOrder = async (orderId: string, updatedData: Partial<Order>) => {
     try {
+      const targetOrder = orders.find((o) => o.id === orderId);
+      
+      // Si el estado cambia de activo a cancelado -> Devolver stock
+      if (targetOrder && targetOrder.status !== 'cancelado' && updatedData.status === 'cancelado') {
+        const items = targetOrder.items.map(i => ({
+          producto_id: i.productId,
+          producto_nombre: i.productName,
+          sku: i.sku,
+          cantidad: i.quantity
+        }));
+        await pedidosService.restaurarStockItems(items, `Devolución por cambio de estado a Cancelado (Pedido ${targetOrder.orderNumber})`);
+      }
+      // Si el estado cambia de cancelado a activo -> Descontar stock
+      else if (targetOrder && targetOrder.status === 'cancelado' && updatedData.status && updatedData.status !== 'cancelado') {
+        const items = targetOrder.items.map(i => ({
+          producto_id: i.productId,
+          producto_nombre: i.productName,
+          sku: i.sku,
+          cantidad: i.quantity
+        }));
+        await pedidosService.descontarStockItems(items, `Deducción por reactivación de pedido ${targetOrder.orderNumber}`);
+      }
+
       const updates: Record<string, any> = {};
       if (updatedData.customer) {
         updates.cliente_nombre = updatedData.customer.name;
@@ -529,6 +564,7 @@ export default function App() {
         );
       }
 
+      await loadInitialData();
       showToast('Pedido actualizado correctamente.');
     } catch (err: any) {
       showToast(err.message || 'Error al actualizar pedido', 'error');
@@ -536,10 +572,19 @@ export default function App() {
     }
   };
 
-  // 2.3 Anular Order
+  // 2.3 Anular Order (con devolución automática de stock)
   const handleAnularOrder = async (orderId: string, reason?: string) => {
     try {
-      await pedidosService.anular(orderId, reason);
+      const targetOrder = orders.find((o) => o.id === orderId);
+      const itemsToRestore = targetOrder ? targetOrder.items.map(i => ({
+        producto_id: i.productId,
+        producto_nombre: i.productName,
+        sku: i.sku,
+        cantidad: i.quantity
+      })) : undefined;
+
+      await pedidosService.anular(orderId, reason, itemsToRestore);
+
       setOrders((prev) =>
         prev.map((o) =>
           o.id === orderId
@@ -570,7 +615,9 @@ export default function App() {
         );
       }
 
-      showToast('Pedido anulado correctamente (Estado: Cancelado).');
+      // Recargar catálogo y stock en vivo
+      await loadInitialData();
+      showToast('Pedido anulado y stock devuelto exitosamente al inventario.');
     } catch (err: any) {
       showToast(err.message || 'Error al anular pedido', 'error');
     }
