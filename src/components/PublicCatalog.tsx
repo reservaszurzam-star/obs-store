@@ -246,17 +246,17 @@ export const PublicCatalog: React.FC<PublicCatalogProps> = ({ products }) => {
                     {(product as any).material || product.category}
                   </p>
 
-                  {/* Botón Agregar a la Bolsa */}
+                  {/* Botón Agregar a la Bolsa Premium */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       if (product.stock > 0) addToCart(product);
                     }}
                     disabled={product.stock <= 0}
-                    className="w-full flex items-center justify-center gap-3 py-3 border border-[#181716] text-[#181716] hover:bg-[#181716] hover:text-[#FDFCFB] transition-all duration-300 text-[10px] font-bold tracking-[0.2em] uppercase mt-3 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#181716]"
+                    className="w-full group/btn flex items-center justify-center gap-2 py-2.5 md:py-3 bg-[#181716] text-[#FDFCFB] hover:bg-[#8C8276] active:scale-[0.98] transition-all duration-300 text-[9px] md:text-[10px] font-bold tracking-[0.2em] uppercase mt-4 disabled:bg-[#E4DFD7]/50 disabled:text-[#A59B8F] disabled:cursor-not-allowed disabled:active:scale-100 shadow-sm hover:shadow"
                   >
                     <span>{product.stock <= 0 ? 'Agotado' : 'Agregar a la Bolsa'}</span>
-                    {product.stock > 0 && <Plus className="w-3 h-3" />}
+                    {product.stock > 0 && <Plus className="w-3 h-3 transition-transform duration-300 group-hover/btn:rotate-90" />}
                   </button>
                 </div>
 
