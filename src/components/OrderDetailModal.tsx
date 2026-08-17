@@ -332,7 +332,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
         }}
       />
       {/* Hidden Printable Receipt for Direct Print */}
-      <div id="order-detail-printable-receipt" className="hidden">
+      <div id="order-detail-printable-receipt" className="hidden print:block printable-content">
         <div className="w-full border border-[#61564A] bg-white text-slate-900 overflow-hidden font-sans shadow-sm">
           {/* Top Black Header */}
           <div className="bg-[#161716] text-[#E4DFD7] p-3.5 sm:p-4 flex justify-between items-center">

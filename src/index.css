@@ -58,18 +58,24 @@ body {
   }
 
   body * {
-    visibility: hidden !important;
+    visibility: hidden;
   }
 
   #shipping-label-print-area,
   #shipping-label-print-area *,
   #printable-receipt,
-  #printable-receipt * {
+  #printable-receipt *,
+  #order-detail-printable-receipt,
+  #order-detail-printable-receipt *,
+  .printable-content,
+  .printable-content * {
     visibility: visible !important;
   }
 
   #shipping-label-print-area,
-  #printable-receipt {
+  #printable-receipt,
+  #order-detail-printable-receipt,
+  .printable-content {
     position: fixed !important;
     left: 0 !important;
     top: 0 !important;
@@ -77,6 +83,7 @@ body {
     max-width: 100% !important;
     margin: 0 auto !important;
     padding: 0 !important;
+    display: block !important;
     box-shadow: none !important;
     border: none !important;
     background: #fff !important;
@@ -84,10 +91,10 @@ body {
     z-index: 9999999 !important;
   }
 
-  #printable-receipt > div {
+  #printable-receipt > div,
+  #order-detail-printable-receipt > div {
     max-width: 100% !important;
     margin: 0 auto !important;
-    border: 1px solid #181716 !important;
     box-shadow: none !important;
   }
 

@@ -10,19 +10,25 @@ export function printElement(elementId: string, title = 'Nota de Venta - Obsidia
     return;
   }
 
-  // Collect all active stylesheets and inline styles from main document
+  // Remove any previous print iframes
+  const oldIframes = document.querySelectorAll('iframe[data-print-frame="true"]');
+  oldIframes.forEach(f => f.remove());
+
+  // Collect all active stylesheets from main document
   const styleElements = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
     .map(el => el.outerHTML)
     .join('\n');
 
   // Create temporary hidden iframe
   const iframe = document.createElement('iframe');
+  iframe.setAttribute('data-print-frame', 'true');
   iframe.style.position = 'fixed';
   iframe.style.right = '0';
   iframe.style.bottom = '0';
   iframe.style.width = '0';
   iframe.style.height = '0';
   iframe.style.border = '0';
+  iframe.style.visibility = 'hidden';
   iframe.setAttribute('aria-hidden', 'true');
   document.body.appendChild(iframe);
 
@@ -31,6 +37,9 @@ export function printElement(elementId: string, title = 'Nota de Venta - Obsidia
     window.print();
     return;
   }
+
+  // Clone clean inner HTML without any top-level 'hidden' class
+  const contentHtml = element.innerHTML;
 
   doc.open();
   doc.write(`<!DOCTYPE html>
@@ -49,42 +58,56 @@ export function printElement(elementId: string, title = 'Nota de Venta - Obsidia
       box-sizing: border-box !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
+      visibility: visible !important;
     }
     html, body {
       margin: 0 !important;
       padding: 0 !important;
-      background: #fff !important;
-      color: #000 !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+      background: #ffffff !important;
+      color: #161716 !important;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
       width: 100% !important;
       height: auto !important;
       overflow: visible !important;
+      visibility: visible !important;
     }
-    .print-container {
+    .print-wrapper {
       width: 100% !important;
-      max-width: 760px !important;
+      max-width: 780px !important;
       margin: 0 auto !important;
       padding: 0 !important;
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
+      display: block !important;
+      visibility: visible !important;
+      background: #ffffff !important;
+    }
+    .print-wrapper * {
+      visibility: visible !important;
+    }
+    .hidden {
+      display: block !important;
+      visibility: visible !important;
     }
   </style>
 </head>
 <body>
-  <div class="print-container">
-    ${element.innerHTML}
+  <div class="print-wrapper">
+    ${contentHtml}
   </div>
-  <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.focus();
-        window.print();
-      }, 300);
-    };
-  </script>
 </body>
 </html>`);
   doc.close();
+
+  const triggerPrint = () => {
+    try {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+    } catch (e) {
+      window.print();
+    }
+  };
+
+  // Wait for resources (images, fonts) inside iframe to render
+  setTimeout(triggerPrint, 350);
 
   // Clean up iframe after user completes/cancels print dialog
   setTimeout(() => {
@@ -95,5 +118,6 @@ export function printElement(elementId: string, title = 'Nota de Venta - Obsidia
     } catch {
       // ignore
     }
-  }, 60000);
+  }, 45000);
 }
+
