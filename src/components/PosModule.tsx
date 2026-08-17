@@ -40,6 +40,7 @@ import { MapLocationPickerModal } from './MapLocationPickerModal';
 import { PackageShippingLabelModal } from './PackageShippingLabelModal';
 import { ShalomBuscador } from './ShalomBuscador';
 import { AgenciaShalom } from '../data/shalomAgencias';
+import { printElement } from '../lib/printHelper';
 
 interface PosModuleProps {
   products: Product[];
@@ -468,7 +469,7 @@ export const PosModule: React.FC<PosModuleProps> = ({
   };
 
   const handlePrintReceipt = () => {
-    window.print();
+    printElement('printable-receipt', `Nota de Venta #${generatedReceipt?.orderNumber || ''}`);
   };
 
   const handleSendWhatsApp = () => {

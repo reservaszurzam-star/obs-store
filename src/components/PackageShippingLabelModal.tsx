@@ -17,6 +17,7 @@ import {
   Compass
 } from 'lucide-react';
 import { Order } from '../types';
+import { printElement } from '../lib/printHelper';
 
 interface PackageShippingLabelModalProps {
   isOpen: boolean;
@@ -87,7 +88,7 @@ export const PackageShippingLabelModal: React.FC<PackageShippingLabelModalProps>
   )}&margin=1`;
 
   const handlePrint = () => {
-    window.print();
+    printElement('shipping-label-print-area', `Rotulo de Envio - ${orderNumber}`);
   };
 
   const handleSendWhatsAppCourier = () => {
