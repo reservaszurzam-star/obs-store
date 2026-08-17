@@ -13,27 +13,41 @@ interface CartItem {
 
 const ProductImage = ({ product }: { product: Product }) => {
   const [hasError, setHasError] = useState(false);
+  const [isTapped, setIsTapped] = useState(false);
 
   if (!product.imageUrl || hasError) {
     return <Diamond className="w-16 h-16 text-[#A59B8F]/40 group-hover:scale-110 transition-transform duration-700 ease-out" />;
   }
 
   return (
-    <>
+    <div 
+      className="absolute inset-0 w-full h-full" 
+      onClick={(e) => {
+        // Prevent default to avoid side effects if the parent ever adds an onClick
+        e.preventDefault(); 
+        setIsTapped(!isTapped);
+      }}
+    >
       <img 
         src={product.imageUrl} 
         alt={product.name}
-        className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out mix-blend-multiply ${product.hoverImageUrl ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
+        className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out mix-blend-multiply ${
+          product.hoverImageUrl 
+            ? `group-hover:opacity-0 ${isTapped ? 'opacity-0' : 'opacity-100'}` 
+            : 'group-hover:scale-105'
+        }`}
         onError={() => setHasError(true)}
       />
       {product.hoverImageUrl && (
         <img 
           src={product.hoverImageUrl} 
           alt={`${product.name} - detalle`}
-          className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out mix-blend-multiply opacity-0 group-hover:opacity-100 group-hover:scale-105"
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out mix-blend-multiply ${
+            isTapped ? 'opacity-100 scale-105' : 'opacity-0'
+          } group-hover:opacity-100 group-hover:scale-105`}
         />
       )}
-    </>
+    </div>
   );
 };
 
